@@ -1,0 +1,137 @@
+import pygame
+from pygame.locals import *
+from OpenGL.GL import *
+from shaders import create_shader_program
+from objects import create_square
+
+W=1
+C=3
+B=4
+P=5
+
+level = [
+    [0, 0, W, W, W, 0, 0, 0, 0],
+    [0, 0, W, B, W, 0, 0, 0, 0],
+    [0, 0, W, 0, W, W, W, W, 0],
+    [W, W, W, C, 0, C, B, W, 0],
+    [W, B, 0, C, P, W, W, W, 0],
+    [W, W, W, W, C, W, 0, 0, 0],
+    [0, 0, 0, W, B, W, 0, 0, 0],
+    [0, 0, 0, W, W, W, 0, 0, 0]
+]
+
+class Player:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+def get_player_position():
+    for i, i_val in enumerate(level):
+        for j, j_val in enumerate(i_val):
+            if j_val == P:
+                return (i, j)
+    return (0, 0)
+
+x, y = get_player_position()
+player = Player(x, y)
+
+def main():
+    pygame.init()
+    display = (600, 600)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
+    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
+
+    glViewport(0, 0, 600, 600)
+
+
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+
+    shader_program = create_shader_program()
+
+    VAO, EBO, square_index = create_square()
+    glUseProgram(shader_program)
+
+    vertex_location = glGetUniformLocation(shader_program, "offset")
+    color_location = glGetUniformLocation(shader_program, "color")
+
+    clock = pygame.time.Clock()
+    running = True
+
+    def render_square(x, y):
+        glUniform4f(color_location, 1.0, 0.0, 1.0, 1.0)
+        glUniform2f(vertex_location, x, y)
+        glBindVertexArray(VAO)
+        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
+
+    def render_player(x, y):
+        glUniform4f(color_location, 0.0, 1.0, 0.0, 1.0)
+        glUniform2f(vertex_location, x, y)
+        glBindVertexArray(VAO)
+        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
+
+    def render_crate(x, y):
+        glUniform4f(color_location, 1.0, 0.0, 0.0, 1.0)
+        glUniform2f(vertex_location, x, y)
+        glBindVertexArray(VAO)
+        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
+
+    def render_bomb(x, y):
+        glUniform4f(color_location, 0.0, 0.0, 1.0, 1.0)
+        glUniform2f(vertex_location, x, y)
+        glBindVertexArray(VAO)
+        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
+
+    def move_left():
+        print(level[player.y][player.x-1])
+        if (level[player.y][player.x-1]!=W):
+            level[player.y][player.x] = 0
+            level[player.y][player.x-1] = P
+            player.x -= 1
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    move_left()
+
+        glClear(GL_COLOR_BUFFER_BIT)
+        glUseProgram(shader_program)
+
+        num_rows = len(level)
+        for row, r_val in enumerate(level):
+            for col, c_val in enumerate(r_val):
+                x = col-3.0
+                y = (num_rows - 1 - row)-3.0
+
+                if (c_val == 1):
+                    render_square(x, y)
+                if (c_val == P):
+                    render_player(x, y)
+                if (c_val == C):
+                    render_crate(x, y)
+                if (c_val == B):
+                    render_bomb(x, y)
+
+
+        glBindVertexArray(0)
+
+        pygame.display.flip()
+        clock.tick(60)
+
+    delete_object(VAO, EBO)
+    glDeleteProgram(shader_program)
+
+    pygame.quit()
+
+def delete_object(VAO, EBO):
+    glDeleteVertexArrays(1, [VAO])
+    glDeleteBuffers(1, [EBO])
+
+
+if __name__ == "__main__":
+    main()
+
