@@ -8,6 +8,7 @@ W = 1
 C = 3
 B = 4
 P = 5
+PB = 54
 
 level = [
     [0, 0, W, W, W, 0, 0, 0, 0],
@@ -140,43 +141,87 @@ def main():
         return False
 
     def move_player_left():
-        if level[player.y][player.x - 1] != W:
+        status = level[player.y][player.x]
+        nextobj = level[player.y][player.x - 1]
+
+        if nextobj != W:
             if level[player.y][player.x - 1] == C:
                 if not move_left(player.x - 1, player.y):
                     return
 
-            level[player.y][player.x] = 0
-            level[player.y][player.x - 1] = P
+            if nextobj == B:
+                level[player.y][player.x - 1] = PB
+            else:
+                level[player.y][player.x - 1] = P
+
+            if status == PB:
+                level[player.y][player.x] = B
+            else:
+                level[player.y][player.x] = 0
+
             player.x -= 1
 
     def move_player_right():
+        status = level[player.y][player.x]
+        nextobj = level[player.y][player.x + 1]
+
         if level[player.y][player.x + 1] != W:
             if level[player.y][player.x + 1] == C:
                 if not move_right(player.x + 1, player.y):
                     return
 
-            level[player.y][player.x] = 0
-            level[player.y][player.x + 1] = P
+            if nextobj == B:
+                level[player.y][player.x + 1] = PB
+            else:
+                level[player.y][player.x + 1] = P
+
+            if status == PB:
+                level[player.y][player.x] = B
+            else:
+                level[player.y][player.x] = 0
+
             player.x += 1
 
     def move_player_up():
-        if level[player.y - 1][player.x] != W:
+        status = level[player.y][player.x]
+        nextobj = level[player.y - 1][player.x]
+
+        if nextobj != W:
             if level[player.y - 1][player.x] == C:
                 if not move_up(player.x, player.y - 1):
                     return
 
-            level[player.y][player.x] = 0
-            level[player.y - 1][player.x] = P
+            if nextobj == B:
+                level[player.y - 1][player.x] = PB
+            else:
+                level[player.y - 1][player.x] = P
+
+            if status == PB:
+                level[player.y][player.x] = B
+            else:
+                level[player.y][player.x] = 0
+
             player.y -= 1
 
     def move_player_down():
-        if level[player.y + 1][player.x] != W:
+        status = level[player.y][player.x]
+        nextobj = level[player.y + 1][player.x]
+
+        if nextobj != W:
             if level[player.y + 1][player.x] == C:
                 if not move_down(player.x, player.y + 1):
                     return
 
-            level[player.y][player.x] = 0
-            level[player.y + 1][player.x] = P
+            if nextobj == B:
+                level[player.y + 1][player.x] = PB
+            else:
+                level[player.y + 1][player.x] = P
+
+            if status == PB:
+                level[player.y][player.x] = B
+            else:
+                level[player.y][player.x] = 0
+
             player.y += 1
 
     while running:
@@ -198,25 +243,20 @@ def main():
 
         num_rows = len(level)
         for row, r_val in enumerate(level):
-            for col, c_val in enumerate(r_val):
+            for col, obj in enumerate(r_val):
                 x = col - 3.0
                 y = (num_rows - 1 - row) - 3.0
 
-                def render_object(obj):
-                    if obj == 1:
-                        render_square(x, y)
-                    if obj == B:
-                        render_bomb(x, y)
-                    if obj == C:
-                        render_crate(x, y)
-                    if obj == P:
-                        render_player(x, y)
-
-                if isinstance(c_val, tuple):
-                    for i in c_val:
-                        render_object(i)
-                else:
-                    render_object(c_val)
+                if obj == 1:
+                    render_square(x, y)
+                if obj == B:
+                    render_bomb(x, y)
+                if obj == C:
+                    render_crate(x, y)
+                if obj == P:
+                    render_player(x, y)
+                if obj == PB:
+                    render_player(x, y)
 
         glBindVertexArray(0)
 
