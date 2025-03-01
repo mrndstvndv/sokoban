@@ -4,10 +4,10 @@ from OpenGL.GL import *
 from shaders import create_shader_program
 from objects import create_square
 
-W=1
-C=3
-B=4
-P=5
+W = 1
+C = 3
+B = 4
+P = 5
 
 level = [
     [0, 0, W, W, W, 0, 0, 0, 0],
@@ -17,13 +17,29 @@ level = [
     [W, B, 0, C, P, W, W, W, 0],
     [W, W, W, W, C, W, 0, 0, 0],
     [0, 0, 0, W, B, W, 0, 0, 0],
-    [0, 0, 0, W, W, W, 0, 0, 0]
+    [0, 0, 0, W, W, W, 0, 0, 0],
 ]
+
+level_2 = [
+    [W, W, W, W, W],
+    [W, 0, 0, 0, W],
+    [W, 0, C, 0, W, 0, W, W, W],
+    [W, 0, C, P, W, 0, W, B, W],
+    [W, W, W, C, W, W, W, B, W],
+    [0, W, W, 0, 0, 0, 0, B, W],
+    [0, W, 0, 0, 0, W, 0, 0, W],
+    [0, W, 0, 0, 0, W, W, W, W],
+    [0, W, W, W, W, W, W, W, W],
+]
+
+level = level_2
+
 
 class Player:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 def get_player_position():
     for i, i_val in enumerate(level):
@@ -32,19 +48,22 @@ def get_player_position():
                 return (i, j)
     return (0, 0)
 
+
 x, y = get_player_position()
 player = Player(x, y)
+
 
 def main():
     pygame.init()
     display = (600, 600)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
+    pygame.display.gl_set_attribute(
+        pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE
+    )
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
     glViewport(0, 0, 600, 600)
-
 
     glClearColor(0.0, 0.0, 0.0, 0.0)
 
@@ -83,12 +102,82 @@ def main():
         glBindVertexArray(VAO)
         glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
 
-    def move_left():
-        print(level[player.y][player.x-1])
-        if (level[player.y][player.x-1]!=W):
+    def move_left(x, y) -> bool:
+        object = level[y][x]
+        nextobj = level[y][x - 1]
+        if nextobj != W and nextobj != C:
+            level[y][x - 1] = object
+            level[y][x] = 0
+            return True
+        return False
+
+    def move_right(x, y) -> bool:
+        object = level[y][x]
+        nextobj = level[y][x + 1]
+        if nextobj != W and nextobj != C:
+            level[y][x + 1] = object
+            level[y][x] = 0
+            return True
+        return False
+
+    def move_up(x, y) -> bool:
+        object = level[y][x]
+        nextobj = level[y - 1][x]
+        if nextobj != W and nextobj != C:
+            level[y - 1][x] = object
+            level[y][x] = 0
+            return True
+        return False
+
+    def move_down(x, y) -> bool:
+        object = level[y][x]
+        nextobj = level[y + 1][x]
+
+        if nextobj != W and nextobj != C:
+            level[y + 1][x] = object
+            level[y][x] = 0
+            return True
+        return False
+
+    def move_player_left():
+        if level[player.y][player.x - 1] != W:
+            if level[player.y][player.x - 1] == C:
+                if not move_left(player.x - 1, player.y):
+                    return
+
             level[player.y][player.x] = 0
-            level[player.y][player.x-1] = P
+            level[player.y][player.x - 1] = P
             player.x -= 1
+
+    def move_player_right():
+        if level[player.y][player.x + 1] != W:
+            if level[player.y][player.x + 1] == C:
+                if not move_right(player.x + 1, player.y):
+                    return
+
+            level[player.y][player.x] = 0
+            level[player.y][player.x + 1] = P
+            player.x += 1
+
+    def move_player_up():
+        if level[player.y - 1][player.x] != W:
+            if level[player.y - 1][player.x] == C:
+                if not move_up(player.x, player.y - 1):
+                    return
+
+            level[player.y][player.x] = 0
+            level[player.y - 1][player.x] = P
+            player.y -= 1
+
+    def move_player_down():
+        if level[player.y + 1][player.x] != W:
+            if level[player.y + 1][player.x] == C:
+                if not move_down(player.x, player.y + 1):
+                    return
+
+            level[player.y][player.x] = 0
+            level[player.y + 1][player.x] = P
+            player.y += 1
 
     while running:
         for event in pygame.event.get():
@@ -96,7 +185,13 @@ def main():
                 running = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
-                    move_left()
+                    move_player_left()
+                if event.key == pygame.K_RIGHT:
+                    move_player_right()
+                if event.key == pygame.K_UP:
+                    move_player_up()
+                if event.key == pygame.K_DOWN:
+                    move_player_down()
 
         glClear(GL_COLOR_BUFFER_BIT)
         glUseProgram(shader_program)
@@ -104,18 +199,24 @@ def main():
         num_rows = len(level)
         for row, r_val in enumerate(level):
             for col, c_val in enumerate(r_val):
-                x = col-3.0
-                y = (num_rows - 1 - row)-3.0
+                x = col - 3.0
+                y = (num_rows - 1 - row) - 3.0
 
-                if (c_val == 1):
-                    render_square(x, y)
-                if (c_val == P):
-                    render_player(x, y)
-                if (c_val == C):
-                    render_crate(x, y)
-                if (c_val == B):
-                    render_bomb(x, y)
+                def render_object(obj):
+                    if obj == 1:
+                        render_square(x, y)
+                    if obj == B:
+                        render_bomb(x, y)
+                    if obj == C:
+                        render_crate(x, y)
+                    if obj == P:
+                        render_player(x, y)
 
+                if isinstance(c_val, tuple):
+                    for i in c_val:
+                        render_object(i)
+                else:
+                    render_object(c_val)
 
         glBindVertexArray(0)
 
@@ -127,6 +228,7 @@ def main():
 
     pygame.quit()
 
+
 def delete_object(VAO, EBO):
     glDeleteVertexArrays(1, [VAO])
     glDeleteBuffers(1, [EBO])
@@ -134,4 +236,3 @@ def delete_object(VAO, EBO):
 
 if __name__ == "__main__":
     main()
-
