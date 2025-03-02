@@ -9,6 +9,7 @@ C = 3
 B = 4
 P = 5
 PB = 54
+CB = 34
 
 level = [
     [0, 0, W, W, W, 0, 0, 0, 0],
@@ -43,10 +44,10 @@ class Player:
 
 
 def get_player_position():
-    for i, i_val in enumerate(level):
-        for j, j_val in enumerate(i_val):
+    for y, i_val in enumerate(level):
+        for x, j_val in enumerate(i_val):
             if j_val == P:
-                return (i, j)
+                return (x, y)
     return (0, 0)
 
 
@@ -104,39 +105,75 @@ def main():
         glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
 
     def move_left(x, y) -> bool:
-        object = level[y][x]
+        status = level[y][x]
         nextobj = level[y][x - 1]
+
         if nextobj != W and nextobj != C:
-            level[y][x - 1] = object
-            level[y][x] = 0
+            if nextobj == B:
+                level[y][x - 1] = CB
+            else:
+                level[y][x - 1] = C
+
+            if status == CB:
+                level[y][x] = B
+            else:
+                level[y][x] = 0
+
             return True
         return False
 
     def move_right(x, y) -> bool:
-        object = level[y][x]
+        status = level[y][x]
         nextobj = level[y][x + 1]
+
         if nextobj != W and nextobj != C:
-            level[y][x + 1] = object
-            level[y][x] = 0
+            if nextobj == B:
+                level[y][x + 1] = CB
+            else:
+                level[y][x + 1] = C
+
+            if status == CB:
+                level[y][x] = B
+            else:
+                level[y][x] = 0
+
             return True
         return False
 
     def move_up(x, y) -> bool:
-        object = level[y][x]
+        status = level[y][x]
         nextobj = level[y - 1][x]
+
         if nextobj != W and nextobj != C:
-            level[y - 1][x] = object
-            level[y][x] = 0
+            if nextobj == B:
+                level[y - 1][x] = CB
+            else:
+                level[y - 1][x] = C
+
+            if status == CB:
+                level[y][x] = B
+            else:
+                level[y][x] = 0
+
             return True
+
         return False
 
     def move_down(x, y) -> bool:
-        object = level[y][x]
+        status = level[y][x]
         nextobj = level[y + 1][x]
 
         if nextobj != W and nextobj != C:
-            level[y + 1][x] = object
-            level[y][x] = 0
+            if nextobj == B:
+                level[y + 1][x] = CB
+            else:
+                level[y + 1][x] = C
+
+            if status == CB:
+                level[y][x] = B
+            else:
+                level[y][x] = 0
+
             return True
         return False
 
@@ -145,11 +182,11 @@ def main():
         nextobj = level[player.y][player.x - 1]
 
         if nextobj != W:
-            if level[player.y][player.x - 1] == C:
+            if nextobj == C or nextobj == CB:
                 if not move_left(player.x - 1, player.y):
                     return
 
-            if nextobj == B:
+            if nextobj == B or nextobj == CB:
                 level[player.y][player.x - 1] = PB
             else:
                 level[player.y][player.x - 1] = P
@@ -165,12 +202,12 @@ def main():
         status = level[player.y][player.x]
         nextobj = level[player.y][player.x + 1]
 
-        if level[player.y][player.x + 1] != W:
-            if level[player.y][player.x + 1] == C:
+        if nextobj != W:
+            if nextobj == C or nextobj == CB:
                 if not move_right(player.x + 1, player.y):
                     return
 
-            if nextobj == B:
+            if nextobj == B or nextobj == CB:
                 level[player.y][player.x + 1] = PB
             else:
                 level[player.y][player.x + 1] = P
@@ -187,11 +224,11 @@ def main():
         nextobj = level[player.y - 1][player.x]
 
         if nextobj != W:
-            if level[player.y - 1][player.x] == C:
+            if nextobj == C or nextobj == CB:
                 if not move_up(player.x, player.y - 1):
                     return
 
-            if nextobj == B:
+            if nextobj == B or nextobj == CB:
                 level[player.y - 1][player.x] = PB
             else:
                 level[player.y - 1][player.x] = P
@@ -208,11 +245,11 @@ def main():
         nextobj = level[player.y + 1][player.x]
 
         if nextobj != W:
-            if level[player.y + 1][player.x] == C:
+            if nextobj == C or nextobj == CB:
                 if not move_down(player.x, player.y + 1):
                     return
 
-            if nextobj == B:
+            if nextobj == B or nextobj == CB:
                 level[player.y + 1][player.x] = PB
             else:
                 level[player.y + 1][player.x] = P
@@ -251,14 +288,23 @@ def main():
                     render_square(x, y)
                 if obj == B:
                     render_bomb(x, y)
-                if obj == C:
+                if obj == C or obj == CB:
                     render_crate(x, y)
-                if obj == P:
-                    render_player(x, y)
-                if obj == PB:
+                if obj == P or obj == PB:
                     render_player(x, y)
 
         glBindVertexArray(0)
+
+        thereIsBomb = False
+        for i in level:
+            for j in i:
+                if j == B or j == PB:
+                    thereIsBomb = True
+                    break
+
+        if thereIsBomb == False:
+            print("you win")
+                
 
         pygame.display.flip()
         clock.tick(60)
