@@ -47,7 +47,18 @@ level_3 = [
     [W, W, W, W, W, W],
 ]
 
-levels = [level_1, level_2, level_3]
+level_4 = [
+    [0, W, W, W, W],
+    [0, W, 0, 0, W, W, W],
+    [0, W, 0, 0, 0, 0, W],
+    [W, W, W, C, W, P, W, W],
+    [W, B, W, 0, W, 0, 0, W],
+    [W, B, C, 0, 0, W, 0, W],
+    [W, B, 0, 0, 0, C, 0, W],
+    [W, W, W, W, W, W, W, W],
+]
+
+levels = [level_1, level_2, level_3, level_4]
 
 
 class Player:
