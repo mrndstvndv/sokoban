@@ -35,7 +35,19 @@ level_2 = [
     [0, W, W, W, W, W, W, W, W],
 ]
 
-levels = [level_1, level_2]
+
+level_3 = [
+    [0, W, W, W, W],
+    [W, W, 0, 0, W],
+    [W, 0, P, C, W],
+    [W, W, C, 0, W, W],
+    [W, W, 0, C, 0, W],
+    [W, B, C, 0, 0, W],
+    [W, B, B, CB, B, W],
+    [W, W, W, W, W, W],
+]
+
+levels = [level_1, level_2, level_3]
 
 
 class Player:
@@ -295,6 +307,7 @@ def main():
                     render_square(x, y)
                 if obj == B:
                     render_bomb(x, y)
+                # todo indicate CB
                 if obj == C or obj == CB:
                     render_crate(x, y)
                 if obj == P or obj == PB:

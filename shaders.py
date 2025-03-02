@@ -8,7 +8,7 @@ uniform vec2 offset;
 
 void main()
 {
-    gl_Position = vec4(aPos + offset, 0.0, 5.0);
+    gl_Position = vec4(aPos + offset, 0.0, 6.0);
 }
 """
 
