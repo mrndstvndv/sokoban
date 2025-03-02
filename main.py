@@ -1,4 +1,5 @@
 import pygame
+import copy
 from pygame.locals import *
 from OpenGL.GL import *
 from shaders import create_shader_program
@@ -69,16 +70,16 @@ def main():
     running = True
 
     level_index = 0
-    current_level = levels[level_index]
+    current_level = copy.deepcopy(levels[level_index])
 
-    def get_player_position():
-        for y, i_val in enumerate(current_level):
+    def get_player_position(lvl):
+        for y, i_val in enumerate(lvl):
             for x, j_val in enumerate(i_val):
                 if j_val == P:
                     return (x, y)
         return (0, 0)
 
-    x, y = get_player_position()
+    x, y = get_player_position(current_level)
     player = Player(x, y)
 
     def render_square(x, y):
@@ -275,6 +276,11 @@ def main():
                     move_player_up()
                 if event.key == pygame.K_DOWN:
                     move_player_down()
+                if event.key == pygame.K_r:
+                    current_level = copy.deepcopy(levels[level_index])
+                    x, y = get_player_position(current_level)
+                    player.x = x
+                    player.y = y
 
         glClear(GL_COLOR_BUFFER_BIT)
         glUseProgram(shader_program)
@@ -306,9 +312,10 @@ def main():
         if thereIsBomb == False:
             print("You win")
             level_index += 1
-            current_level = levels[level_index]
-            x, y = get_player_position()
-            player = Player(x, y)
+            current_level = copy.deepcopy(levels[level_index])
+            x, y = get_player_position(current_level)
+            player.x = x
+            player.y = y
 
         pygame.display.flip()
         clock.tick(60)
