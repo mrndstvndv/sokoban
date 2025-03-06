@@ -67,6 +67,132 @@ class Player:
         self.y = y
 
 
+class Game:
+    def __init__(self, levels):
+        self.levels = levels
+        self.level_index = 0
+        self.current_level = copy.deepcopy(self.levels[self.level_index])
+        self.player = self.init_player()
+    
+    def init_player(self):
+        x, y = self.get_player_position(self.current_level)
+        return Player(x, y)
+    
+    def get_player_position(self, level):
+        for y, row in enumerate(level):
+            for x, cell in enumerate(row):
+                if cell == P or cell == PB:
+                    return (x, y)
+        return (0, 0)
+    
+    def reset_level(self):
+        self.current_level = copy.deepcopy(self.levels[self.level_index])
+        self.player = self.init_player()
+    
+    def next_level(self):
+        self.level_index += 1
+        if self.level_index < len(self.levels):
+            self.reset_level()
+            return True
+        return False
+    
+    def check_win(self):
+        for row in self.current_level:
+            for cell in row:
+                if cell == B or cell == PB:
+                    return False
+        return True
+    
+    def move_object(self, x, y, dx, dy):
+        status = self.current_level[y][x]
+        nextobj = self.current_level[y+dy][x+dx]
+        
+        if nextobj != W and nextobj != C and nextobj != CB:
+            if nextobj == B:
+                self.current_level[y+dy][x+dx] = CB
+            else:
+                self.current_level[y+dy][x+dx] = C
+                
+            if status == CB:
+                self.current_level[y][x] = B
+            else:
+                self.current_level[y][x] = 0
+                
+            return True
+        return False
+    
+    def move_player(self, dx, dy):
+        status = self.current_level[self.player.y][self.player.x]
+        nextobj = self.current_level[self.player.y+dy][self.player.x+dx]
+        
+        if nextobj != W:
+            if nextobj == C or nextobj == CB:
+                if not self.move_object(self.player.x+dx, self.player.y+dy, dx, dy):
+                    return
+            
+            if nextobj == B or nextobj == CB:
+                self.current_level[self.player.y+dy][self.player.x+dx] = PB
+            else:
+                self.current_level[self.player.y+dy][self.player.x+dx] = P
+                
+            if status == PB:
+                self.current_level[self.player.y][self.player.x] = B
+            else:
+                self.current_level[self.player.y][self.player.x] = 0
+                
+            self.player.x += dx
+            self.player.y += dy
+
+
+class Renderer:
+    def __init__(self, shader_program, VAO, square_index):
+        self.shader_program = shader_program
+        self.VAO = VAO
+        self.square_index = square_index
+        self.vertex_location = glGetUniformLocation(shader_program, "offset")
+        self.color_location = glGetUniformLocation(shader_program, "color")
+    
+    def render_square(self, x, y):
+        glUniform4f(self.color_location, 1.0, 0.0, 1.0, 1.0)
+        glUniform2f(self.vertex_location, x, y)
+        glBindVertexArray(self.VAO)
+        glDrawElements(GL_TRIANGLES, self.square_index, GL_UNSIGNED_INT, None)
+    
+    def render_player(self, x, y):
+        glUniform4f(self.color_location, 0.0, 1.0, 0.0, 1.0)
+        glUniform2f(self.vertex_location, x, y)
+        glBindVertexArray(self.VAO)
+        glDrawElements(GL_TRIANGLES, self.square_index, GL_UNSIGNED_INT, None)
+    
+    def render_crate(self, x, y):
+        glUniform4f(self.color_location, 1.0, 0.0, 0.0, 1.0)
+        glUniform2f(self.vertex_location, x, y)
+        glBindVertexArray(self.VAO)
+        glDrawElements(GL_TRIANGLES, self.square_index, GL_UNSIGNED_INT, None)
+    
+    def render_bomb(self, x, y):
+        glUniform4f(self.color_location, 0.0, 0.0, 1.0, 1.0)
+        glUniform2f(self.vertex_location, x, y)
+        glBindVertexArray(self.VAO)
+        glDrawElements(GL_TRIANGLES, self.square_index, GL_UNSIGNED_INT, None)
+    
+    def render_level(self, level):
+        num_rows = len(level)
+        for row, r_val in enumerate(level):
+            for col, obj in enumerate(r_val):
+                x = col - 3.0
+                y = (num_rows - 1 - row) - 3.0
+                
+                if obj == W:
+                    self.render_square(x, y)
+                if obj == B:
+                    self.render_bomb(x, y)
+                if obj == C or obj == CB:
+                    self.render_crate(x, y)
+                if obj == P or obj == PB:
+                    self.render_player(x, y)
+
+
 def main():
     pygame.init()
     display = (600, 600)
@@ -78,213 +204,17 @@ def main():
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
     glViewport(0, 0, 600, 600)
-
     glClearColor(0.0, 0.0, 0.0, 0.0)
 
     shader_program = create_shader_program()
-
     VAO, EBO, square_index = create_square()
     glUseProgram(shader_program)
 
-    vertex_location = glGetUniformLocation(shader_program, "offset")
-    color_location = glGetUniformLocation(shader_program, "color")
-
     clock = pygame.time.Clock()
     running = True
-
-    level_index = 0
-    current_level = copy.deepcopy(levels[level_index])
-
-    def get_player_position(lvl):
-        for y, i_val in enumerate(lvl):
-            for x, j_val in enumerate(i_val):
-                if j_val == P:
-                    return (x, y)
-        return (0, 0)
-
-    x, y = get_player_position(current_level)
-    player = Player(x, y)
-
-    def render_square(x, y):
-        glUniform4f(color_location, 1.0, 0.0, 1.0, 1.0)
-        glUniform2f(vertex_location, x, y)
-        glBindVertexArray(VAO)
-        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
-
-    def render_player(x, y):
-        glUniform4f(color_location, 0.0, 1.0, 0.0, 1.0)
-        glUniform2f(vertex_location, x, y)
-        glBindVertexArray(VAO)
-        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
-
-    def render_crate(x, y):
-        glUniform4f(color_location, 1.0, 0.0, 0.0, 1.0)
-        glUniform2f(vertex_location, x, y)
-        glBindVertexArray(VAO)
-        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
-
-    def render_bomb(x, y):
-        glUniform4f(color_location, 0.0, 0.0, 1.0, 1.0)
-        glUniform2f(vertex_location, x, y)
-        glBindVertexArray(VAO)
-        glDrawElements(GL_TRIANGLES, square_index, GL_UNSIGNED_INT, None)
-
-    def move_left(x, y) -> bool:
-        status = current_level[y][x]
-        nextobj = current_level[y][x - 1]
-
-        if nextobj != W and nextobj != C and nextobj != CB:
-            if nextobj == B:
-                current_level[y][x - 1] = CB
-            else:
-                current_level[y][x - 1] = C
-
-            if status == CB:
-                current_level[y][x] = B
-            else:
-                current_level[y][x] = 0
-
-            return True
-        return False
-
-    def move_right(x, y) -> bool:
-        status = current_level[y][x]
-        nextobj = current_level[y][x + 1]
-
-        if nextobj != W and nextobj != C and nextobj != CB:
-            if nextobj == B:
-                current_level[y][x + 1] = CB
-            else:
-                current_level[y][x + 1] = C
-
-            if status == CB:
-                current_level[y][x] = B
-            else:
-                current_level[y][x] = 0
-
-            return True
-        return False
-
-    def move_up(x, y) -> bool:
-        status = current_level[y][x]
-        nextobj = current_level[y - 1][x]
-
-        if nextobj != W and nextobj != C and nextobj != CB:
-            if nextobj == B:
-                current_level[y - 1][x] = CB
-            else:
-                current_level[y - 1][x] = C
-
-            if status == CB:
-                current_level[y][x] = B
-            else:
-                current_level[y][x] = 0
-
-            return True
-
-        return False
-
-    def move_down(x, y) -> bool:
-        status = current_level[y][x]
-        nextobj = current_level[y + 1][x]
-
-        if nextobj != W and nextobj != C and nextobj != CB:
-            if nextobj == B:
-                current_level[y + 1][x] = CB
-            else:
-                current_level[y + 1][x] = C
-
-            if status == CB:
-                current_level[y][x] = B
-            else:
-                current_level[y][x] = 0
-
-            return True
-        return False
-
-    def move_player_left():
-        status = current_level[player.y][player.x]
-        nextobj = current_level[player.y][player.x - 1]
-
-        if nextobj != W:
-            if nextobj == C or nextobj == CB:
-                if not move_left(player.x - 1, player.y):
-                    return
-
-            if nextobj == B or nextobj == CB:
-                current_level[player.y][player.x - 1] = PB
-            else:
-                current_level[player.y][player.x - 1] = P
-
-            if status == PB:
-                current_level[player.y][player.x] = B
-            else:
-                current_level[player.y][player.x] = 0
-
-            player.x -= 1
-
-    def move_player_right():
-        status = current_level[player.y][player.x]
-        nextobj = current_level[player.y][player.x + 1]
-
-        if nextobj != W:
-            if nextobj == C or nextobj == CB:
-                if not move_right(player.x + 1, player.y):
-                    return
-
-            if nextobj == B or nextobj == CB:
-                current_level[player.y][player.x + 1] = PB
-            else:
-                current_level[player.y][player.x + 1] = P
-
-            if status == PB:
-                current_level[player.y][player.x] = B
-            else:
-                current_level[player.y][player.x] = 0
-
-            player.x += 1
-
-    def move_player_up():
-        status = current_level[player.y][player.x]
-        nextobj = current_level[player.y - 1][player.x]
-
-        if nextobj != W:
-            if nextobj == C or nextobj == CB:
-                if not move_up(player.x, player.y - 1):
-                    return
-
-            if nextobj == B or nextobj == CB:
-                current_level[player.y - 1][player.x] = PB
-            else:
-                current_level[player.y - 1][player.x] = P
-
-            if status == PB:
-                current_level[player.y][player.x] = B
-            else:
-                current_level[player.y][player.x] = 0
-
-            player.y -= 1
-
-    def move_player_down():
-        status = current_level[player.y][player.x]
-        nextobj = current_level[player.y + 1][player.x]
-
-        if nextobj != W:
-            if nextobj == C or nextobj == CB:
-                if not move_down(player.x, player.y + 1):
-                    return
-
-            if nextobj == B or nextobj == CB:
-                current_level[player.y + 1][player.x] = PB
-            else:
-                current_level[player.y + 1][player.x] = P
-
-            if status == PB:
-                current_level[player.y][player.x] = B
-            else:
-                current_level[player.y][player.x] = 0
-
-            player.y += 1
+    
+    game = Game(levels)
+    renderer = Renderer(shader_program, VAO, square_index)
 
     while running:
         for event in pygame.event.get():
@@ -292,61 +222,34 @@ def main():
                 running = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
-                    move_player_left()
+                    game.move_player(-1, 0)
                 if event.key == pygame.K_RIGHT:
-                    move_player_right()
+                    game.move_player(1, 0)
                 if event.key == pygame.K_UP:
-                    move_player_up()
+                    game.move_player(0, -1)
                 if event.key == pygame.K_DOWN:
-                    move_player_down()
+                    game.move_player(0, 1)
                 if event.key == pygame.K_r:
-                    current_level = copy.deepcopy(levels[level_index])
-                    x, y = get_player_position(current_level)
-                    player.x = x
-                    player.y = y
+                    game.reset_level()
 
         glClear(GL_COLOR_BUFFER_BIT)
         glUseProgram(shader_program)
-
-        num_rows = len(current_level)
-        for row, r_val in enumerate(current_level):
-            for col, obj in enumerate(r_val):
-                x = col - 3.0
-                y = (num_rows - 1 - row) - 3.0
-
-                if obj == 1:
-                    render_square(x, y)
-                if obj == B:
-                    render_bomb(x, y)
-                # todo indicate CB
-                if obj == C or obj == CB:
-                    render_crate(x, y)
-                if obj == P or obj == PB:
-                    render_player(x, y)
-
+        
+        renderer.render_level(game.current_level)
+        
         glBindVertexArray(0)
 
-        thereIsBomb = False
-        for i in current_level:
-            for j in i:
-                if j == B or j == PB:
-                    thereIsBomb = True
-                    break
-
-        if thereIsBomb == False:
+        if game.check_win():
             print("You win")
-            level_index += 1
-            current_level = copy.deepcopy(levels[level_index])
-            x, y = get_player_position(current_level)
-            player.x = x
-            player.y = y
+            if not game.next_level():
+                print("Game completed!")
+                running = False
 
         pygame.display.flip()
         clock.tick(60)
 
     delete_object(VAO, EBO)
     glDeleteProgram(shader_program)
-
     pygame.quit()
 
 
