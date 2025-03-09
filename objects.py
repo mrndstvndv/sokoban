@@ -103,10 +103,17 @@ class Two:
         width = 0.5
 
         shape.square(
-            (-width, height-0.25),  # bottom-left
-            (width, height-0.25),  # bottom-right
+            (-width, height - 0.25),  # bottom-left
+            (width, height - 0.25),  # bottom-right
             (width, height),  # top-right
             (-width, height),  # top-left
+        )
+
+        shape.square(
+            (width - 0.25, 0.125),  # bottom-left
+            (width, 0.125),  # bottom-right
+            (width, height),  # top-right
+            (width - 0.25, height),  # top-left
         )
 
         shape.square(
@@ -118,10 +125,189 @@ class Two:
 
         shape.square(
             (-width, -height),  # bottom-left
-            (width, -height),  # bottom-right
-            (width, -height+0.25),  # top-right
-            (-width, -height+0.25),  # top-left
+            (-width + 0.25, -height),  # bottom-right
+            (-width + 0.25, -0.125),  # top-right
+            (-width, -0.125),  # top-left
         )
 
+        shape.square(
+            (-width, -height),  # bottom-left
+            (width, -height),  # bottom-right
+            (width, -height + 0.25),  # top-right
+            (-width, -height + 0.25),  # top-left
+        )
+
+        self.vao, self.ebo, self.square_index = shape.build()
+
+
+class Three:
+    def __init__(self):
+        shape = Shape()
+
+        height = 0.5
+        width = 0.5
+
+        shape.square(
+            (-width, height - 0.25),  # bottom-left
+            (width, height - 0.25),  # bottom-right
+            (width, height),  # top-right
+            (-width, height),  # top-left
+        )
+
+        shape.square(
+            (width - 0.25, 0.125),  # bottom-left
+            (width, 0.125),  # bottom-right
+            (width, height),  # top-right
+            (width - 0.25, height),  # top-left
+        )
+
+        shape.square(
+            (-width, -0.125),  # bottom-left
+            (width, -0.125),  # bottom-right
+            (width, 0.125),  # top-right
+            (-width, 0.125),  # top-left
+        )
+
+        shape.square(
+            (width - 0.25, -height),  # bottom-left
+            (width, -height),  # bottom-right
+            (width, -0.125),  # top-right
+            (width - 0.25, -0.125),  # top-left
+        )
+
+        shape.square(
+            (-width, -height),  # bottom-left
+            (width, -height),  # bottom-right
+            (width, -height + 0.25),  # top-right
+            (-width, -height + 0.25),  # top-left
+        )
+
+        self.vao, self.ebo, self.square_index = shape.build()
+
+
+class Four:
+    def __init__(self):
+        shape = Shape()
+
+        height = 0.5
+        width = 0.5
+
+        shape.square(
+            (-width, 0.125),  # bottom-left
+            (-width + 0.25, 0.125),  # bottom-right
+            (-width + 0.25, height),  # top-right
+            (-width, height),  # top-left
+        )
+
+        shape.square(
+            (-width, -0.125),  # bottom-left
+            (width, -0.125),  # bottom-right
+            (width, 0.125),  # top-right
+            (-width, 0.125),  # top-left
+        )
+
+        shape.square(
+            (width - 0.25, -height),  # bottom-left
+            (width, -height),  # bottom-right
+            (width, height),  # top-right
+            (width - 0.25, height),  # top-left
+        )
+
+        self.vao, self.ebo, self.square_index = shape.build()
+
+
+class Five:
+    def __init__(self):
+        shape = Shape()
+
+        height = 0.5
+        width = 0.5
+
+        shape.square(
+            (-width, height - 0.25),  # bottom-left
+            (width, height - 0.25),  # bottom-right
+            (width, height),  # top-right
+            (-width, height),  # top-left
+        )
+
+        shape.square(
+            (-width + 0.25, 0.125),  # bottom-left
+            (-width, 0.125),  # bottom-right
+            (-width, height),  # top-right
+            (-width + 0.25, height),  # top-left
+        )
+
+        shape.square(
+            (-width, -0.125),  # bottom-left
+            (width, -0.125),  # bottom-right
+            (width, 0.125),  # top-right
+            (-width, 0.125),  # top-left
+        )
+
+        shape.square(
+            (+width, -height),  # bottom-left
+            (+width - 0.25, -height),  # bottom-right
+            (+width - 0.25, -0.125),  # top-right
+            (+width, -0.125),  # top-left
+        )
+
+        shape.square(
+            (-width, -height),  # bottom-left
+            (width, -height),  # bottom-right
+            (width, -height + 0.25),  # top-right
+            (-width, -height + 0.25),  # top-left
+        )
+
+        self.vao, self.ebo, self.square_index = shape.build()
+
+
+class Six:
+    def __init__(self):
+        shape = Shape()
+
+        height = 0.5
+        width = 0.5
+
+        shape.square(
+            (-width, height - 0.25),  # bottom-left
+            (width, height - 0.25),  # bottom-right
+            (width, height),  # top-right
+            (-width, height),  # top-left
+        )
+
+        shape.square(
+            (-width + 0.25, 0.125),  # bottom-left
+            (-width, 0.125),  # bottom-right
+            (-width, height),  # top-right
+            (-width + 0.25, height),  # top-left
+        )
+
+        shape.square(
+            (-width, -0.125),  # bottom-left
+            (width, -0.125),  # bottom-right
+            (width, 0.125),  # top-right
+            (-width, 0.125),  # top-left
+        )
+
+        shape.square(
+            (-width, -height),  # bottom-left
+            (-width + 0.25, -height),  # bottom-right
+            (-width + 0.25, -0.125),  # top-right
+            (-width, -0.125),  # top-left
+        )
+
+        shape.square(
+            (width, -height),  # bottom-left
+            (width - 0.25, -height),  # bottom-right
+            (width - 0.25, -0.125),  # top-right
+            (width, -0.125),  # top-left
+        )
+
+        shape.square(
+            (-width, -height),  # bottom-left
+            (width, -height),  # bottom-right
+            (width, -height + 0.25),  # top-right
+            (-width, -height + 0.25),  # top-left
+        )
 
         self.vao, self.ebo, self.square_index = shape.build()
