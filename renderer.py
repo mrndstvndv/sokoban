@@ -1,6 +1,6 @@
 from pygame.locals import *
 from OpenGL.GL import *
-from objects import Five, Square, One, Two, Three, Four, Six
+from objects import Bomb, Crate, Five, Pixel, Square, One, Two, Three, Four, Six, Wall
 
 from game import W, C, B, P, PB, CB
 
@@ -11,6 +11,8 @@ def delete_object(vao, ebo):
 
 
 PURPLE = (1.0, 0.0, 1.0, 1.0)
+BLUE = (0.0, 0.0, 1.0, 1.0)
+BROWN = (0.788, 0.549, 0.294, 1.0)
 
 
 class Renderer:
@@ -18,6 +20,10 @@ class Renderer:
         self.shader_program = shader_program
         self.nums = [One(), Two(), Three(), Four(), Five(), Six()]
         self.square = Square()
+        self.wall = Wall()
+        self.bomb = Bomb()
+        self.pixel = Pixel()
+        self.crate = Crate()
         self.color_location = glGetUniformLocation(shader_program, "color")
         self.vertex_location = glGetUniformLocation(shader_program, "offset")
 
@@ -64,11 +70,11 @@ class Renderer:
                 y = (num_rows - 1 - row) - 3.0
 
                 if obj == W:
-                    self.render_square(x, y)
+                    self.render_obj(self.wall, x, y, PURPLE)
                 if obj == B:
-                    self.render_bomb(x, y)
+                    self.render_obj(self.bomb, x, y, BLUE)
                 if obj == C or obj == CB:
-                    self.render_crate(x, y)
+                    self.render_obj(self.crate, x, y, BROWN)
                 if obj == P or obj == PB:
                     self.render_player(x, y)
 
