@@ -104,7 +104,11 @@ class Renderer:
                 if obj == B:
                     self.render_obj(self.bomb, x, y, BLUE)
                 if obj == C or obj == CB:
-                    self.render_obj(self.crate, x, y, BROWN)
+                    color = BROWN
+                    if obj == CB:
+                        color = BLUE
+
+                    self.render_obj(self.crate, x, y, color)
                 if obj == P or obj == PB:
                     self.render_obj(self.player, x, y, YELLOW)
 
