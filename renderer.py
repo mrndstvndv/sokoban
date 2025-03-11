@@ -3,9 +3,13 @@ from OpenGL.GL import *
 from objects import (
     Bomb,
     Crate,
+    Eight,
     Five,
+    Nine,
+    Zero,
     Pixel,
     Player,
+    Seven,
     Square,
     One,
     Two,
@@ -32,7 +36,18 @@ YELLOW = (0.95294118, 0.88627451, 0.69411765, 1.0)
 class Renderer:
     def __init__(self, shader_program):
         self.shader_program = shader_program
-        self.nums = [One(), Two(), Three(), Four(), Five(), Six()]
+        self.nums = [
+            Zero(),
+            One(),
+            Two(),
+            Three(),
+            Four(),
+            Five(),
+            Six(),
+            Seven(),
+            Eight(),
+            Nine(),
+        ]
         self.square = Square()
         self.wall = Wall()
         self.bomb = Bomb()
@@ -74,9 +89,9 @@ class Renderer:
 
     def render_level(self, level, level_index):
         for index, num in enumerate(str(level_index + 1)):
-            x = index - 5
-            y = index - -4.7
-            self.render_obj(self.nums[int(num) - 1], x, y, PURPLE)
+            x = (index * 1.15) - 5.25
+            y = -4.7
+            self.render_obj(self.nums[int(num)], x, y, PURPLE)
 
         num_rows = len(level)
         for row, r_val in enumerate(level):
