@@ -113,4 +113,11 @@ class Renderer:
                     self.render_obj(self.player, x, y, YELLOW)
 
     def de_init(self):
-        delete_object(self.square.vao, self.square.ebo)
+        self.square.de_init()
+        self.wall.de_init()
+        self.bomb.de_init()
+        self.pixel.de_init()
+        self.crate.de_init()
+        self.player.de_init()
+        for num in self.nums:
+            num.de_init()

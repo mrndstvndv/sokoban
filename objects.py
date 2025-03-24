@@ -34,7 +34,22 @@ def create_object(vertices, indices_arr):
     return (VAO, EBO, len(indices))
 
 
-class Square:
+class Object:
+    vao = None
+    ebo = None
+
+    def de_init(self):
+        if self.vao == None:
+            Exception("vao does not exist")
+
+        if self.ebo == None:
+            Exception("ebo does not exist")
+
+        glDeleteVertexArrays(1, [self.vao])
+        glDeleteBuffers(1, [self.ebo])
+
+
+class Square(Object):
     def __init__(self):
         shape = Shape()
         shape.square(
@@ -46,7 +61,7 @@ class Square:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class One:
+class One(Object):
     def __init__(self):
         shape = Shape()
         points = [
@@ -82,7 +97,7 @@ class One:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Shape:
+class Shape(Object):
     def __init__(self, scale=1):
         self.vertices = []
         self.indices = []
@@ -119,7 +134,7 @@ class Shape:
         return create_object(self.vertices, self.indices)
 
 
-class Two:
+class Two(Object):
     def __init__(self):
         shape = Shape()
 
@@ -164,7 +179,7 @@ class Two:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Three:
+class Three(Object):
     def __init__(self):
         shape = Shape()
 
@@ -209,7 +224,7 @@ class Three:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Four:
+class Four(Object):
     def __init__(self):
         shape = Shape()
 
@@ -240,7 +255,7 @@ class Four:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Five:
+class Five(Object):
     def __init__(self):
         shape = Shape()
 
@@ -285,7 +300,7 @@ class Five:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Six:
+class Six(Object):
     def __init__(self):
         shape = Shape()
 
@@ -337,7 +352,7 @@ class Six:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Seven:
+class Seven(Object):
     def __init__(self) -> None:
         shape = Shape()
         points = [
@@ -383,7 +398,7 @@ class Seven:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Eight:
+class Eight(Object):
     def __init__(self) -> None:
         shape = Shape()
         points = [
@@ -469,7 +484,7 @@ class Eight:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Nine:
+class Nine(Object):
     def __init__(self) -> None:
         shape = Shape()
         points = [
@@ -535,7 +550,7 @@ class Nine:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Zero:
+class Zero(Object):
     def __init__(self) -> None:
         shape = Shape()
         points = [
@@ -609,7 +624,7 @@ class Zero:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Pixel:
+class Pixel(Object):
     def __init__(self):
         shape = Shape()
 
@@ -626,7 +641,7 @@ class Pixel:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Wall:
+class Wall(Object):
     def __init__(self):
         shape = Shape()
 
@@ -679,7 +694,7 @@ class Wall:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Bomb:
+class Bomb(Object):
     def __init__(self):
         points = [
             (0.25, 0.35),
@@ -721,7 +736,7 @@ class Bomb:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Crate:
+class Crate(Object):
     def __init__(self):
         points = [
             (-0.35, 0.35),
@@ -763,7 +778,7 @@ class Crate:
         self.vao, self.ebo, self.square_index = shape.build()
 
 
-class Player:
+class Player(Object):
     def __init__(self):
         points = [
             (0.05, 0.45),
