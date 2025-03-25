@@ -14,11 +14,16 @@ jobs:
         with:
           path: master
 
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      - name: astral-sh/setup-uv
+        uses: astral-sh/setup-uv@v5.4.0
         with:
-          buildozer_version: stable
+          pyproject-file: "pyproject.toml"
+
+      - name: Build for android
+        run: |
+          ls .
+          uv sync
+          uv run buildozer -v android debug
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
