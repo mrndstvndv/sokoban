@@ -24,7 +24,7 @@ jobs:
           java-version: '17'
 
       - name: Buildozer reqirements
-      - run: |
+        run: |
           sudo apt-get -y install aidl
 
       - name: Build for android
