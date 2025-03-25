@@ -20,9 +20,9 @@ jobs:
           pyproject-file: "$GITHUB_WORKSPACE/master/pyproject.toml"
 
       - name: Build for android
-        working-directory: "$GITHUB_WORKSPACE/master"
         run: |
-          ls $GITHUB_WORKSPACE
+          ls $GITHUB_WORKSPACE/master
+          cd "$GITHUB_WORKSPACE/master"
           uv sync
           uv run buildozer -v android debug
 
