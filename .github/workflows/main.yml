@@ -25,8 +25,9 @@ jobs:
 
       - name: Buildozer reqirements
         run: |
-          sudo apt-get -y install aidl zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 libffi-dev
-
+          sudo apt-get update -y
+          sudo apt-get -y install aidl zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 libffi-dev
+          
       - name: Build for android
         run: |
           ls $GITHUB_WORKSPACE/master
