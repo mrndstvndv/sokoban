@@ -17,9 +17,10 @@ jobs:
       - name: astral-sh/setup-uv
         uses: astral-sh/setup-uv@v5.4.0
         with:
-          pyproject-file: "$GITHUB_WORKSPACE/pyproject.toml"
+          pyproject-file: "$GITHUB_WORKSPACE/master/pyproject.toml"
 
       - name: Build for android
+        working-directory: "$GITHUB_WORKSPACE/master"
         run: |
           ls $GITHUB_WORKSPACE
           uv sync
