@@ -17,11 +17,11 @@ jobs:
       - name: astral-sh/setup-uv
         uses: astral-sh/setup-uv@v5.4.0
         with:
-          pyproject-file: "pyproject.toml"
+          pyproject-file: "$GITHUB_WORKSPACE/pyproject.toml"
 
       - name: Build for android
         run: |
-          ls .
+          ls $GITHUB_WORKSPACE
           uv sync
           uv run buildozer -v android debug
 
