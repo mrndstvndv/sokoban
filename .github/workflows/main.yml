@@ -16,7 +16,7 @@ jobs:
         uses: mrndstvndv/buildozer-action@v1.1.4
         id: buildozer
         with:
-          workdir: test_app
+          workdir: sokoban
           buildozer_version: stable
 
       - name: Upload artifacts
