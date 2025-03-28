@@ -1,5 +1,5 @@
 from pygame.locals import *
-from OpenGL.GL import *
+from config import gl
 from objects import (
     Bomb,
     Crate,
@@ -23,8 +23,8 @@ from game import W, C, B, P, PB, CB
 
 
 def delete_object(vao, ebo):
-    glDeleteVertexArrays(1, [vao])
-    glDeleteBuffers(1, [ebo])
+    gl.glDeleteVertexArrays(1, [vao])
+    gl.glDeleteBuffers(1, [ebo])
 
 
 PURPLE = (1.0, 0.0, 1.0, 1.0)
@@ -54,38 +54,48 @@ class Renderer:
         self.pixel = Pixel()
         self.crate = Crate()
         self.player = Player()
-        self.color_location = glGetUniformLocation(shader_program, "color")
-        self.vertex_location = glGetUniformLocation(shader_program, "offset")
+        self.color_location = gl.glGetUniformLocation(shader_program, "color")
+        self.vertex_location = gl.glGetUniformLocation(shader_program, "offset")
 
     def render_obj(self, object, x, y, color):
-        glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
-        glUniform2f(self.vertex_location, x, y)
-        glBindVertexArray(object.vao)
-        glDrawElements(GL_TRIANGLES, object.square_index, GL_UNSIGNED_INT, None)
+        gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
+        gl.glUniform2f(self.vertex_location, x, y)
+        gl.glBindVertexArray(object.vao)
+        gl.glDrawElements(
+            gl.GL_TRIANGLES, object.square_index, gl.GL_UNSIGNED_INT, None
+        )
 
     def render_square(self, x, y):
-        glUniform4f(self.color_location, 1.0, 0.0, 1.0, 1.0)
-        glUniform2f(self.vertex_location, x, y)
-        glBindVertexArray(self.square.vao)
-        glDrawElements(GL_TRIANGLES, self.square.square_index, GL_UNSIGNED_INT, None)
+        gl.glUniform4f(self.color_location, 1.0, 0.0, 1.0, 1.0)
+        gl.glUniform2f(self.vertex_location, x, y)
+        gl.glBindVertexArray(self.square.vao)
+        gl.glDrawElements(
+            gl.GL_TRIANGLES, self.square.square_index, gl.GL_UNSIGNED_INT, None
+        )
 
     def render_player(self, x, y):
-        glUniform4f(self.color_location, 0.0, 1.0, 0.0, 1.0)
-        glUniform2f(self.vertex_location, x, y)
-        glBindVertexArray(self.square.vao)
-        glDrawElements(GL_TRIANGLES, self.square.square_index, GL_UNSIGNED_INT, None)
+        gl.glUniform4f(self.color_location, 0.0, 1.0, 0.0, 1.0)
+        gl.glUniform2f(self.vertex_location, x, y)
+        gl.glBindVertexArray(self.square.vao)
+        gl.glDrawElements(
+            gl.GL_TRIANGLES, self.square.square_index, gl.GL_UNSIGNED_INT, None
+        )
 
     def render_crate(self, x, y):
-        glUniform4f(self.color_location, 1.0, 0.0, 0.0, 1.0)
-        glUniform2f(self.vertex_location, x, y)
-        glBindVertexArray(self.square.vao)
-        glDrawElements(GL_TRIANGLES, self.square.square_index, GL_UNSIGNED_INT, None)
+        gl.glUniform4f(self.color_location, 1.0, 0.0, 0.0, 1.0)
+        gl.glUniform2f(self.vertex_location, x, y)
+        gl.glBindVertexArray(self.square.vao)
+        gl.glDrawElements(
+            gl.GL_TRIANGLES, self.square.square_index, gl.GL_UNSIGNED_INT, None
+        )
 
     def render_bomb(self, x, y):
-        glUniform4f(self.color_location, 0.0, 0.0, 1.0, 1.0)
-        glUniform2f(self.vertex_location, x, y)
-        glBindVertexArray(self.square.vao)
-        glDrawElements(GL_TRIANGLES, self.square.square_index, GL_UNSIGNED_INT, None)
+        gl.glUniform4f(self.color_location, 0.0, 0.0, 1.0, 1.0)
+        gl.glUniform2f(self.vertex_location, x, y)
+        gl.glBindVertexArray(self.square.vao)
+        gl.glDrawElements(
+            gl.GL_TRIANGLES, self.square.square_index, gl.GL_UNSIGNED_INT, None
+        )
 
     def render_level(self, level, level_index):
         for index, num in enumerate(str(level_index + 1)):

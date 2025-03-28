@@ -1,10 +1,10 @@
 import pygame
 from pygame.locals import *
-from OpenGL.GL import *
 from shaders import create_shader_program
 from renderer import Renderer
 from game import Game
 from levels import levels
+from config import gl
 
 
 def main():
@@ -17,11 +17,11 @@ def main():
     )
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
-    glViewport(0, 0, 600, 600)
-    glClearColor(0.0, 0.0, 0.0, 0.0)
+    gl.glViewport(0, 0, 600, 600)
+    gl.glClearColor(0.0, 0.0, 0.0, 0.0)
 
     shader_program = create_shader_program()
-    glUseProgram(shader_program)
+    gl.glUseProgram(shader_program)
 
     clock = pygame.time.Clock()
     running = True
@@ -45,12 +45,12 @@ def main():
                 if event.key == pygame.K_r:
                     game.reset_level()
 
-        glClear(GL_COLOR_BUFFER_BIT)
-        glUseProgram(shader_program)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        gl.glUseProgram(shader_program)
 
         renderer.render_level(game.current_level, game.level_index)
 
-        glBindVertexArray(0)
+        gl.glBindVertexArray(0)
 
         if game.check_win():
             print("You win")
@@ -61,9 +61,9 @@ def main():
         pygame.display.flip()
         clock.tick(60)
 
-    # WARN: I do not think we are doing deinit right, macos lags when the game is running
+    # WARN: I do not think we are doing deinit right, macos lags when the game is running I think that python is just cpu intensive
     renderer.de_init()
-    glDeleteProgram(shader_program)
+    gl.glDeleteProgram(shader_program)
     pygame.quit()
 
 

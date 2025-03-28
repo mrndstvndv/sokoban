@@ -1,4 +1,5 @@
-from OpenGL.GL import *
+from config import gl
+
 import numpy as np
 import ctypes
 
@@ -7,29 +8,29 @@ def create_object(vertices, indices_arr):
     vertices = np.array(vertices, dtype=np.float32)
     indices = np.array(indices_arr, dtype=np.uint32)
 
-    VAO = glGenVertexArrays(1)
-    VBO = glGenBuffers(1)
-    EBO = glGenBuffers(1)
+    VAO = gl.glGenVertexArrays(1)
+    VBO = gl.glGenBuffers(1)
+    EBO = gl.glGenBuffers(1)
 
-    glBindVertexArray(VAO)
+    gl.glBindVertexArray(VAO)
 
     # Bind and set vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO)
-    glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
+    gl.glBindBuffer(gl.GL_ARRAY_BUFFER, VBO)
+    gl.glBufferData(gl.GL_ARRAY_BUFFER, vertices.nbytes, vertices, gl.GL_STATIC_DRAW)
 
     # Bind and set element buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
+    gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO)
+    gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, gl.GL_STATIC_DRAW)
 
     # Set vertex attribute pointers
-    glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, 2 * ctypes.sizeof(ctypes.c_float), ctypes.c_void_p(0)
+    gl.glVertexAttribPointer(
+        0, 2, gl.GL_FLOAT, gl.GL_FALSE, 2 * ctypes.sizeof(ctypes.c_float), ctypes.c_void_p(0)
     )
-    glEnableVertexAttribArray(0)
+    gl.glEnableVertexAttribArray(0)
 
     # Unbind VAO (not the EBO)
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
-    glBindVertexArray(0)
+    gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+    gl.glBindVertexArray(0)
 
     return (VAO, EBO, len(indices))
 
@@ -45,8 +46,8 @@ class Object:
         if self.ebo == None:
             Exception("ebo does not exist")
 
-        glDeleteVertexArrays(1, [self.vao])
-        glDeleteBuffers(1, [self.ebo])
+        gl.glDeleteVertexArrays(1, [self.vao])
+        gl.glDeleteBuffers(1, [self.ebo])
 
 
 class Square(Object):

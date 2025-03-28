@@ -1,4 +1,4 @@
-from OpenGL.GL import *
+from config import gl
 
 vertex_shader_src = """
 #version 330 core
@@ -25,30 +25,30 @@ void main(){
 
 
 def compile_shader(shader_type, source):
-    shader = glCreateShader(shader_type)
-    glShaderSource(shader, source)
-    glCompileShader(shader)
+    shader = gl.glCreateShader(shader_type)
+    gl.glShaderSource(shader, source)
+    gl.glCompileShader(shader)
 
-    if glGetShaderiv(shader, GL_COMPILE_STATUS) != GL_TRUE:
-        raise RuntimeError(glGetShaderInfoLog(shader).decode())
+    if gl.glGetShaderiv(shader, gl.GL_COMPILE_STATUS) != gl.GL_TRUE:
+        raise RuntimeError(gl.glGetShaderInfoLog(shader).decode())
 
     return shader
 
 
 def create_shader_program():
-    vertex_shader = compile_shader(GL_VERTEX_SHADER, vertex_shader_src)
-    fragment_shader = compile_shader(GL_FRAGMENT_SHADER, fragment_shader_src)
+    vertex_shader = compile_shader(gl.GL_VERTEX_SHADER, vertex_shader_src)
+    fragment_shader = compile_shader(gl.GL_FRAGMENT_SHADER, fragment_shader_src)
 
-    shader_program = glCreateProgram()
-    glAttachShader(shader_program, vertex_shader)
-    glAttachShader(shader_program, fragment_shader)
-    glLinkProgram(shader_program)
+    shader_program = gl.glCreateProgram()
+    gl.glAttachShader(shader_program, vertex_shader)
+    gl.glAttachShader(shader_program, fragment_shader)
+    gl.glLinkProgram(shader_program)
 
-    if glGetProgramiv(shader_program, GL_LINK_STATUS) != GL_TRUE:
-        raise RuntimeError(glGetProgramInfoLog(shader_program).decode())
+    if gl.glGetProgramiv(shader_program, gl.GL_LINK_STATUS) != gl.GL_TRUE:
+        raise RuntimeError(gl.glGetProgramInfoLog(shader_program).decode())
 
-    glDeleteShader(vertex_shader)
-    glDeleteShader(fragment_shader)
+    gl.glDeleteShader(vertex_shader)
+    gl.glDeleteShader(fragment_shader)
 
     return shader_program
 
