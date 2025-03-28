@@ -4,16 +4,17 @@ from shaders import create_shader_program
 from renderer import Renderer
 from game import Game
 from levels import levels
-from config import gl
+from config import gl, context
 
 
 def main():
     pygame.init()
     display = (600, 600)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 0)
+
     pygame.display.gl_set_attribute(
-        pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE
+        pygame.GL_CONTEXT_PROFILE_MASK, context
     )
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
