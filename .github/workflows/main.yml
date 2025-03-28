@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build with Buildozer
-        uses: mrndstvndv/buildozer-action@v320a33e
+        uses: mrndstvndv/buildozer-action@v1.1.5
         id: buildozer
         with:
           buildozer_version: stable
