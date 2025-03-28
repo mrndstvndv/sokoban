@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build with Buildozer
-        uses: mrndstvndv/buildozer-action@v1.1.4
+        uses: mrndstvndv/buildozer-action@v320a33e
         id: buildozer
         with:
           buildozer_version: stable
@@ -22,4 +22,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: package
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/myapp-0.1-arm64-v8a-debug.apk
