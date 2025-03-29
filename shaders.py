@@ -5,10 +5,11 @@ vertex_shader_src = f"""
 layout (location=0) in vec2 aPos;
 
 uniform vec2 offset;
+uniform float scale;
 
 void main()
 {{
-    gl_Position = vec4(aPos + offset, 0.0, {SCALE});
+    gl_Position = vec4((aPos + offset)*scale, 0.0, {SCALE});
 }}
 """
 

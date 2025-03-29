@@ -7,6 +7,8 @@ import numpy as np
 import math
 import ctypes
 
+from utils import Vec2f
+
 
 def create_object(vertices, indices_arr):
     vertices = np.array(vertices, dtype=np.float32)
@@ -860,18 +862,27 @@ class Circle(Object):
 
         self.vao, self.ebo, self.index = circle.obj()
 
+
 class Rectangle(Object):
-    def __init__(self) -> None:
+    def __init__(self, start: Vec2f, end: Vec2f) -> None:
+        self.start = start
+        self.end = end
 
-        vertices = [
-            -0.5, -0.5,  # Bottom-left
-            0.5, -0.5,  # Bottom-right
-            0.5, 0.5,  # Top-right
-            -0.5, 0.5,  # Top
-        ]
+        top_left = (start.x, start.y)
+        top_right = (end.x, start.y)
+        bot_right = (end.x, end.y)
+        bot_left = (start.x, end.y)
 
-        indices = [
-            0, 1, 2, 3, 4, 5, 6, 7
-        ]
+        vertices = [*bot_left, *bot_right, *top_right, *top_left]
+
+        indices = [0, 1, 2, 3, 4, 5, 6, 7]
 
         self.vao, self.ebo, self.index = create_object(vertices, indices)
+
+    def in_bounds(self, pos: Vec2f) -> bool:
+        return (
+            pos.x >= self.start.x
+            and pos.x <= self.end.x
+            and pos.y <= self.start.y
+            and pos.y >= self.end.y
+        )
