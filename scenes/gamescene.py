@@ -1,5 +1,8 @@
+import pygame
 from pygame.locals import *
+import pygame
 from config import gl
+import levels
 from objects import (
     Bomb,
     Crate,
@@ -19,7 +22,10 @@ from objects import (
     Wall,
 )
 
-from game import W, C, B, P, PB, CB
+from game import W, C, B, P, PB, CB, Game
+from scenes.scene import Scene
+from shaders import create_shader_program
+import shaders
 
 
 def delete_object(vao, ebo):
@@ -33,9 +39,9 @@ BROWN = (0.788, 0.549, 0.294, 1.0)
 YELLOW = (0.95294118, 0.88627451, 0.69411765, 1.0)
 
 
-class Renderer:
+class GameScene(Scene):
     def __init__(self, shader_program):
-        self.shader_program = shader_program
+        super().__init__(shader_program)
         self.nums = [
             Zero(),
             One(),
@@ -56,6 +62,7 @@ class Renderer:
         self.player = Player()
         self.color_location = gl.glGetUniformLocation(shader_program, "color")
         self.vertex_location = gl.glGetUniformLocation(shader_program, "offset")
+        self.game = Game(levels.levels)
 
     def render_obj(self, object, x, y, color):
         gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
@@ -99,8 +106,8 @@ class Renderer:
 
     def render_level(self, level, level_index):
         for index, num in enumerate(str(level_index + 1)):
-            x = (index * 1.15) - 5.25
-            y = -4.7
+            x = (index * 1.15)
+            y = 9
             self.render_obj(self.nums[int(num)], x, y, PURPLE)
 
         num_rows = len(level)
@@ -122,7 +129,31 @@ class Renderer:
                 if obj == P or obj == PB:
                     self.render_obj(self.player, x, y, YELLOW)
 
+    def render(self, events):
+        super().render(events)
+
+        for event in events:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    self.game.move_player(-1, 0)
+                if event.key == pygame.K_RIGHT:
+                    self.game.move_player(1, 0)
+                if event.key == pygame.K_UP:
+                    self.game.move_player(0, -1)
+                if event.key == pygame.K_DOWN:
+                    self.game.move_player(0, 1)
+                if event.key == pygame.K_r:
+                    self.game.reset_level()
+
+        self.render_level(self.game.current_level, self.game.level_index)
+
+        if self.game.check_win():
+            print("You win")
+            if not self.game.next_level():
+                print("Game completed!")
+
     def de_init(self):
+        super().de_init()
         self.square.de_init()
         self.wall.de_init()
         self.bomb.de_init()

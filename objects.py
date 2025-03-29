@@ -1,6 +1,10 @@
+from typing import List, Tuple
+
+from pygame import math
 from config import gl
 
 import numpy as np
+import math
 import ctypes
 
 
@@ -20,11 +24,18 @@ def create_object(vertices, indices_arr):
 
     # Bind and set element buffer
     gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO)
-    gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, gl.GL_STATIC_DRAW)
+    gl.glBufferData(
+        gl.GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, gl.GL_STATIC_DRAW
+    )
 
     # Set vertex attribute pointers
     gl.glVertexAttribPointer(
-        0, 2, gl.GL_FLOAT, gl.GL_FALSE, 2 * ctypes.sizeof(ctypes.c_float), ctypes.c_void_p(0)
+        0,
+        2,
+        gl.GL_FLOAT,
+        gl.GL_FALSE,
+        2 * ctypes.sizeof(ctypes.c_float),
+        ctypes.c_void_p(0),
     )
     gl.glEnableVertexAttribArray(0)
 
@@ -38,6 +49,7 @@ def create_object(vertices, indices_arr):
 class Object:
     vao = None
     ebo = None
+    index = None
 
     def de_init(self):
         if self.vao == None:
@@ -816,3 +828,50 @@ class Player(Object):
         shape = Shape()
         shape.plot_pixels(points)
         self.vao, self.ebo, self.square_index = shape.build()
+
+
+class CircleGenerator:
+    def __init__(self, radius, quality) -> None:
+        self.radius: float = radius
+        self.quality: int = quality
+        self.da: float = (2.0 * np.pi) / float(quality) if quality > 0 else 0.0
+
+    def get_point(self, n: int) -> Tuple[float, float]:
+        angle = self.da * float(n)
+        return self.radius * math.cos(angle), self.radius * math.sin(angle)
+
+    def generate_circle(self) -> List[Tuple[float, float]]:
+        return [self.get_point(i) for i in range(self.quality)]
+
+    def obj(self):
+        vertices = self.generate_circle()
+        vertices_flat = [coord for point in vertices for coord in point]
+
+        indices = []
+        for i in range(self.quality):
+            indices.append(i)
+
+        return create_object(vertices_flat, indices)
+
+
+class Circle(Object):
+    def __init__(self, radius, quality) -> None:
+        circle = CircleGenerator(radius, quality)
+
+        self.vao, self.ebo, self.index = circle.obj()
+
+class Rectangle(Object):
+    def __init__(self) -> None:
+
+        vertices = [
+            -0.5, -0.5,  # Bottom-left
+            0.5, -0.5,  # Bottom-right
+            0.5, 0.5,  # Top-right
+            -0.5, 0.5,  # Top
+        ]
+
+        indices = [
+            0, 1, 2, 3, 4, 5, 6, 7
+        ]
+
+        self.vao, self.ebo, self.index = create_object(vertices, indices)

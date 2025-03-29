@@ -1,70 +1,56 @@
 import pygame
 from pygame.locals import *
+from scenes import Scene, GameScene, MenuScene
 from shaders import create_shader_program
-from renderer import Renderer
-from game import Game
-from levels import levels
-from config import gl, context
+from config import DISPLAY_HEIGHT, DISPLAY_WIDTH, gl, context
+import shaders
 
 
 def main():
     pygame.init()
-    display = (600, 600)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 0)
 
-    pygame.display.gl_set_attribute(
-        pygame.GL_CONTEXT_PROFILE_MASK, context
-    )
-    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, context)
+    pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT), DOUBLEBUF | OPENGL)
 
-    gl.glViewport(0, 0, 600, 600)
+    gl.glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT)
     gl.glClearColor(0.0, 0.0, 0.0, 0.0)
-
-    shader_program = create_shader_program()
-    gl.glUseProgram(shader_program)
 
     clock = pygame.time.Clock()
     running = True
 
-    game = Game(levels)
-    renderer = Renderer(shader_program)
+    shader = create_shader_program(
+        shaders.vertex_shader_src, shaders.fragment_shader_src
+    )
+
+    gameScene: GameScene = GameScene(shader)
+    menuScene: MenuScene = MenuScene(shader)
+
+    currentScene: Scene = gameScene
 
     while running:
-        for event in pygame.event.get():
+        events = pygame.event.get()
+
+        for event in events:
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    game.move_player(-1, 0)
-                if event.key == pygame.K_RIGHT:
-                    game.move_player(1, 0)
-                if event.key == pygame.K_UP:
-                    game.move_player(0, -1)
-                if event.key == pygame.K_DOWN:
-                    game.move_player(0, 1)
-                if event.key == pygame.K_r:
-                    game.reset_level()
+                if event.key == pygame.K_2:
+                    currentScene = menuScene
+                if event.key == pygame.K_1:
+                    currentScene = gameScene
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-        gl.glUseProgram(shader_program)
 
-        renderer.render_level(game.current_level, game.level_index)
+        currentScene.render(events)
 
         gl.glBindVertexArray(0)
-
-        if game.check_win():
-            print("You win")
-            if not game.next_level():
-                print("Game completed!")
-                running = False
 
         pygame.display.flip()
         clock.tick(60)
 
-    # WARN: I do not think we are doing deinit right, macos lags when the game is running I think that python is just cpu intensive
-    renderer.de_init()
-    gl.glDeleteProgram(shader_program)
+    gameScene.de_init()
     pygame.quit()
 
 

@@ -1,15 +1,15 @@
-from config import gl
+from config import SCALE, gl
 
-vertex_shader_src = """
+vertex_shader_src = f"""
 #version 330 core
 layout (location=0) in vec2 aPos;
 
 uniform vec2 offset;
 
 void main()
-{
-    gl_Position = vec4(aPos + offset, 0.0, 6.0);
-}
+{{
+    gl_Position = vec4(aPos + offset, 0.0, {SCALE});
+}}
 """
 
 fragment_shader_src = """
@@ -35,7 +35,7 @@ def compile_shader(shader_type, source):
     return shader
 
 
-def create_shader_program():
+def create_shader_program(vertex_shader_src: str, fragment_shader_src: str):
     vertex_shader = compile_shader(gl.GL_VERTEX_SHADER, vertex_shader_src)
     fragment_shader = compile_shader(gl.GL_FRAGMENT_SHADER, fragment_shader_src)
 

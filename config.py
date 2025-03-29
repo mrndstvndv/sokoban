@@ -9,3 +9,7 @@ try:
 except ImportError:
     gl = importlib.import_module("OpenGL.GL")
     context = pygame.GL_CONTEXT_PROFILE_CORE
+
+DISPLAY_WIDTH = 800
+DISPLAY_HEIGHT = 800
+SCALE = 10
