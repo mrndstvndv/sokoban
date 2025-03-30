@@ -136,13 +136,15 @@ class Shape(Object):
         self.indices += [start, start + 1, start + 2]
         self.indices += [start, start + 2, start + 3]
 
-    def plot_pixels(self, points):
+    def plot_pixels(self, points, size=0.1):
+        size = size / 2
+
         for x, y in points:
             self.square(
-                (x - 0.05, y - 0.05),  # bottom-left
-                (x + 0.05, y - 0.05),  # bottom-right
-                (x + 0.05, y + 0.05),  # top-right
-                (x - 0.05, y + 0.05),  # top-left
+                (x - size, y - size),  # Bottom-left
+                (x + size, y - size),  # Bottom-right
+                (x + size, y + size),  # Top-right
+                (x - size, y + size),  # Top
             )
 
     def build(self):

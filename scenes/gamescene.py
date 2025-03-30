@@ -62,11 +62,13 @@ class GameScene(Scene):
         self.player = Player()
         self.color_location = gl.glGetUniformLocation(shader_program, "color")
         self.vertex_location = gl.glGetUniformLocation(shader_program, "offset")
+        self.scale_location = gl.glGetUniformLocation(shader_program, "scale")
         self.game = Game(levels.levels)
 
     def render_obj(self, object, x, y, color):
         gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
         gl.glUniform2f(self.vertex_location, x, y)
+        gl.glUniform1f(self.scale_location, 1.0)
         gl.glBindVertexArray(object.vao)
         gl.glDrawElements(
             gl.GL_TRIANGLES, object.square_index, gl.GL_UNSIGNED_INT, None
