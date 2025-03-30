@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 from pygame import math
 from config import gl
@@ -20,38 +20,133 @@ def create_object(vertices, indices_arr):
 
     gl.glBindVertexArray(VAO)
 
-    # Bind and set vertex buffer
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, VBO)
     gl.glBufferData(gl.GL_ARRAY_BUFFER, vertices.nbytes, vertices, gl.GL_STATIC_DRAW)
 
-    # Bind and set element buffer
     gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO)
     gl.glBufferData(
         gl.GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, gl.GL_STATIC_DRAW
     )
 
-    # Set vertex attribute pointers
+    # Position attribute (location = 0)
     gl.glVertexAttribPointer(
         0,
         2,
         gl.GL_FLOAT,
         gl.GL_FALSE,
-        2 * ctypes.sizeof(ctypes.c_float),
+        6 * ctypes.sizeof(ctypes.c_float),
         ctypes.c_void_p(0),
     )
     gl.glEnableVertexAttribArray(0)
 
-    # Unbind VAO (not the EBO)
+    # Color attribute (location = 1)
+    gl.glVertexAttribPointer(
+        1,
+        4,
+        gl.GL_FLOAT,
+        gl.GL_FALSE,
+        6 * ctypes.sizeof(ctypes.c_float),
+        ctypes.c_void_p(2 * ctypes.sizeof(ctypes.c_float)),
+    )
+    gl.glEnableVertexAttribArray(1)
+
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
     gl.glBindVertexArray(0)
 
     return (VAO, EBO, len(indices))
 
 
+class Shape:
+    def __init__(self, scale=1):
+        self.vertices = []
+        self.indices = []
+        self.scale = scale
+
+    def square(
+        self, bottom_left, bottom_right, top_right, top_left, color=(1.0, 1.0, 1.0, 0.0)
+    ):
+        self.vertices += [
+            bottom_left[0] * self.scale,
+            bottom_left[1] * self.scale,
+            *color,
+            bottom_right[0] * self.scale,
+            bottom_right[1] * self.scale,
+            *color,
+            top_right[0] * self.scale,
+            top_right[1] * self.scale,
+            *color,
+            top_left[0] * self.scale,
+            top_left[1] * self.scale,
+            *color,
+        ]
+
+        start = (len(self.vertices) // 6) - 4
+
+        self.indices += [start, start + 1, start + 2]
+        self.indices += [start, start + 2, start + 3]
+
+    def plot_pixels(self, points, size=0.1):
+        size = size / 2
+
+        if len(points[0]) == 3:
+            for x, y, color in points:
+                self.square(
+                    (x - size, y - size),  # Bottom-left
+                    (x + size, y - size),  # Bottom-right
+                    (x + size, y + size),  # Top-right
+                    (x - size, y + size),  # Top
+                    color,
+                )
+
+        else:
+            for x, y in points:
+                self.square(
+                    (x - size, y - size),  # Bottom-left
+                    (x + size, y - size),  # Bottom-right
+                    (x + size, y + size),  # Top-right
+                    (x - size, y + size),  # Top
+                )
+
+    def get_bounds(self) -> Tuple[Vec2f, Vec2f] | None:
+        """
+        Finds the top-left (start point) and bottom-right (end point) of a given set of vertices.
+
+        :param vertices: A list where every 6 elements represent (x, y, r, g, b, a).
+        :return: (start_point, end_point) as tuples (x, y)
+        """
+        if not self.vertices:
+            return None  # Return None if there are no vertices
+
+        # Initialize min/max values
+        min_x = float("inf")
+        max_x = float("-inf")
+        min_y = float("inf")
+        max_y = float("-inf")
+
+        # Iterate through the vertices, stepping by 6 to only consider (x, y)
+        for i in range(0, len(self.vertices), 6):
+            x, y = self.vertices[i], self.vertices[i + 1]
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            min_y = min(min_y, y)
+            max_y = max(max_y, y)
+
+        # Start point: Top-left (min_x, max_y)
+        start_point = Vec2f(min_x, max_y)
+        # End point: Bottom-right (max_x, min_y)
+        end_point = Vec2f(max_x, min_y)
+
+        return start_point, end_point
+
+    def build(self):
+        return create_object(self.vertices, self.indices)
+
+
 class Object:
     vao = None
     ebo = None
     index = None
+    shape: Shape
 
     def de_init(self):
         if self.vao == None:
@@ -110,45 +205,6 @@ class One(Object):
 
         shape.plot_pixels(points)
         self.vao, self.ebo, self.square_index = shape.build()
-
-
-class Shape(Object):
-    def __init__(self, scale=1):
-        self.vertices = []
-        self.indices = []
-        self.scale = scale
-
-    def square(self, bottom_left, bottom_right, top_right, top_left):
-        self.vertices += [
-            bottom_left[0],
-            bottom_left[1],
-            bottom_right[0],
-            bottom_right[1],
-            top_right[0],
-            top_right[1],
-            top_left[0],
-            top_left[1],
-        ]
-
-        last_vertice_index = (len(self.vertices) // 2) - 1
-        start = last_vertice_index - 3
-
-        self.indices += [start, start + 1, start + 2]
-        self.indices += [start, start + 2, start + 3]
-
-    def plot_pixels(self, points, size=0.1):
-        size = size / 2
-
-        for x, y in points:
-            self.square(
-                (x - size, y - size),  # Bottom-left
-                (x + size, y - size),  # Bottom-right
-                (x + size, y + size),  # Top-right
-                (x - size, y + size),  # Top
-            )
-
-    def build(self):
-        return create_object(self.vertices, self.indices)
 
 
 class Two(Object):

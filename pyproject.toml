@@ -3,7 +3,7 @@ name = "elective"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "init>=0.1.0",
     "numpy>=2.0.2",

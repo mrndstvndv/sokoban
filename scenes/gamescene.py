@@ -134,6 +134,8 @@ class GameScene(Scene):
     def render(self, events):
         super().render(events)
 
+        gl.glClearColor(0.0, 0.0, 0.0, 0.0)
+
         for event in events:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:

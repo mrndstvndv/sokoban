@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import config
 from scenes import Scene, GameScene, MenuScene
 from shaders import create_shader_program
 from config import DISPLAY_HEIGHT, DISPLAY_WIDTH, gl, context
@@ -35,6 +36,9 @@ def main():
         for event in events:
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == config.BUTTON_CLICKED:
+                if event.button == "play":
+                    currentScene = gameScene
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_2:
                     currentScene = menuScene

@@ -1,12 +1,81 @@
 from math import remainder
+from typing import Callable, List, Tuple
 from OpenGL.GL import *
 import pygame
-from assets.text import A
+from pygame.event import Event
+from assets.text import Options, Play
+import config
+from game import PB
 from objects import Object, Rectangle
 from scenes.gamescene import PURPLE
 from scenes.scene import Scene
 from config import gl
 from utils import Vec2f, normalize
+import utils
+
+
+class Button:
+    on_click: Callable[[], None]
+
+    def __init__(
+        self, position: Vec2f, scale: float, max_scale: float, obj: Object, shader
+    ) -> None:
+        self.obj = obj
+        self.initial_scale = scale
+        self.current_scale = scale
+        self.max_scale = max_scale
+        self.color_location = gl.glGetUniformLocation(shader, "color")
+        self.offset_location = gl.glGetUniformLocation(shader, "offset")
+        self.scale_location = gl.glGetUniformLocation(shader, "scale")
+        self.position = position
+        shape_bounds: Tuple[Vec2f, Vec2f] | None = self.obj.shape.get_bounds()
+
+        if shape_bounds == None:
+            Exception("Bounds not found")
+
+        start, end = shape_bounds
+
+        self.bounds: Tuple[Vec2f, Vec2f] = (
+            Vec2f(start.x + position.x, start.y + position.y),
+            Vec2f(end.x + position.y, end.y + position.y),
+        )
+
+    def render_obj_old(self, object: Object, scale, color):
+        gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
+        gl.glUniform2f(self.offset_location, *self.position)
+        gl.glUniform1f(self.scale_location, scale)
+        gl.glBindVertexArray(object.vao)
+        gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
+
+    def in_bounds(self, pos: Vec2f) -> bool:
+        shape_bounds: Tuple[Vec2f, Vec2f] | None = self.bounds
+
+        start, end = shape_bounds
+
+        return (
+            pos.x >= start.x and pos.x <= end.x and pos.y <= start.y and pos.y >= end.y
+        )
+
+    def set_on_click(self, callback: Callable[[], None]) -> None:
+        self.on_click = callback
+
+    def render(self, events: List[Event]):
+        self.render_obj_old(self.obj, self.current_scale, (1.0, 1.0, 1.0, 1.0))
+
+        mx, my = pygame.mouse.get_pos()
+        mouse_pos = normalize(mx, my)
+
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
+                if self.in_bounds(mouse_pos):
+                    self.on_click()
+
+        if self.in_bounds(mouse_pos):
+            if self.current_scale < self.max_scale:
+                self.current_scale += 0.1
+        else:
+            if self.current_scale > 1:
+                self.current_scale -= 0.1
 
 
 class MenuScene(Scene):
@@ -19,7 +88,12 @@ class MenuScene(Scene):
         self.offset_location = gl.glGetUniformLocation(shader, "offset")
         self.scale_location = gl.glGetUniformLocation(shader, "scale")
         self.rectangle = Rectangle(Vec2f(-4.0, 1.0), Vec2f(4.0, -1.0))
-        self.a = A()
+        self.pbtn = Button(Vec2f(0.0, 1.25), 1.0, 1.1, Play(), shader)
+        self.obtn = Button(Vec2f(0.0, -1.25), 1.0, 1.1, Options(), shader)
+        self.pbtn.set_on_click(
+            lambda: utils.post_event(config.BUTTON_CLICKED, button="play")
+        )
+        self.obtn.set_on_click(lambda: print("play button clicked!"))
 
     def render_obj(self, object: Object, scale, color):
         gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
@@ -28,32 +102,15 @@ class MenuScene(Scene):
         gl.glBindVertexArray(object.vao)
         gl.glDrawElements(GL_TRIANGLE_FAN, object.index, gl.GL_UNSIGNED_INT, None)
 
-    def render_obj_old(self, object: Object, scale, color):
-        gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
-        gl.glUniform2f(self.offset_location, 0.0, 0.0)
-        gl.glUniform1f(self.scale_location, scale)
-        gl.glBindVertexArray(object.vao)
-        gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
-
     def render(self, events) -> None:
         super().render(events)
 
-        mx, my = pygame.mouse.get_pos()
-        mouse_pos = normalize(mx, my)
+        gl.glClearColor(1.0, 1.0, 0.0, 1.0)
 
-        print(f"MOUSE: {mouse_pos.x}, {mouse_pos.y}")
+        self.pbtn.render(events)
+        self.obtn.render(events)
 
-        if self.rectangle.in_bounds(mouse_pos):
-            print("in bounds")
-            if self.current_scale < self.max_scale:
-                self.current_scale += 0.1
-        else:
-            if self.current_scale > 1:
-                self.current_scale -= 0.1
-
-        self.render_obj(self.rectangle, self.current_scale, PURPLE)
-
-        self.render_obj_old(self.a, self.current_scale*4.5, (1.0, 1.0, 1.0, 1.0))
+        # self.render_obj_old(self.a, self.current_scale * 20, (1.0, 1.0, 1.0, 1.0))
 
     def de_init(self) -> None:
         super().de_init()

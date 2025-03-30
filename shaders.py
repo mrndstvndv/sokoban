@@ -3,24 +3,31 @@ from config import SCALE, gl
 vertex_shader_src = f"""
 #version 330 core
 layout (location=0) in vec2 aPos;
+layout (location=1) in vec4 aColor;
 
 uniform vec2 offset;
 uniform float scale;
 
+out vec4 vertexColor;
+
 void main()
 {{
     gl_Position = vec4((aPos + offset)*scale, 0.0, {SCALE});
+    vertexColor = aColor;
 }}
 """
 
 fragment_shader_src = """
 #version 330 core
 
-out vec4 FragColor;
 uniform vec4 color;
 
+in vec4 vertexColor;
+
+out vec4 FragColor;
+
 void main(){
-    FragColor = color; // dito po
+    FragColor = vertexColor.a > 0.0 ? vertexColor : color;
 }
 """
 
