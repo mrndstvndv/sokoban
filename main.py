@@ -37,6 +37,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == config.BUTTON_CLICKED:
+                pass
                 if event.button == "play":
                     currentScene = gameScene
             if event.type == pygame.KEYUP:

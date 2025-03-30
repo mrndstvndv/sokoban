@@ -28,6 +28,8 @@ class Button:
         self.offset_location = gl.glGetUniformLocation(shader, "offset")
         self.scale_location = gl.glGetUniformLocation(shader, "scale")
         self.position = position
+
+    def get_bounds(self):
         shape_bounds: Tuple[Vec2f, Vec2f] | None = self.obj.shape.get_bounds()
 
         if shape_bounds == None:
@@ -35,10 +37,13 @@ class Button:
 
         start, end = shape_bounds
 
-        self.bounds: Tuple[Vec2f, Vec2f] = (
-            Vec2f(start.x + position.x, start.y + position.y),
-            Vec2f(end.x + position.y, end.y + position.y),
+        return (
+            Vec2f(start.x + self.position.x, start.y + self.position.y),
+            Vec2f(end.x + self.position.y, end.y + self.position.y),
         )
+
+    def set_position(self, pos: Vec2f):
+        self.position = pos
 
     def render_obj_old(self, object: Object, scale, color):
         gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
@@ -48,7 +53,7 @@ class Button:
         gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
 
     def in_bounds(self, pos: Vec2f) -> bool:
-        shape_bounds: Tuple[Vec2f, Vec2f] | None = self.bounds
+        shape_bounds: Tuple[Vec2f, Vec2f] | None = self.get_bounds()
 
         start, end = shape_bounds
 
@@ -65,22 +70,28 @@ class Button:
         mx, my = pygame.mouse.get_pos()
         mouse_pos = normalize(mx, my)
 
+        in_bounds = self.in_bounds(mouse_pos)
+
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
-                if self.in_bounds(mouse_pos):
+                if in_bounds:
+                    self.current_scale = 1.0
+            elif event.type == pygame.MOUSEBUTTONUP and event.button ==1:
+                if in_bounds:
                     self.on_click()
-
-        if self.in_bounds(mouse_pos):
-            if self.current_scale < self.max_scale:
-                self.current_scale += 0.1
-        else:
-            if self.current_scale > 1:
-                self.current_scale -= 0.1
+            else:
+                if self.in_bounds(mouse_pos):
+                    if self.current_scale < self.max_scale:
+                        self.current_scale += 0.1
+                else:
+                    if self.current_scale > 1:
+                        self.current_scale -= 0.1
 
 
 class MenuScene(Scene):
     max_scale = 1.1
     current_scale = 1
+    load = False
 
     def __init__(self, shader) -> None:
         super().__init__(shader)
@@ -104,7 +115,6 @@ class MenuScene(Scene):
 
     def render(self, events) -> None:
         super().render(events)
-
         gl.glClearColor(1.0, 1.0, 0.0, 1.0)
 
         self.pbtn.render(events)
