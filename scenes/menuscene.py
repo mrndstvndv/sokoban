@@ -28,6 +28,7 @@ class Button:
         self.offset_location = gl.glGetUniformLocation(shader, "offset")
         self.scale_location = gl.glGetUniformLocation(shader, "scale")
         self.position = position
+        self.bounds = self.get_bounds()
 
     def get_bounds(self):
         shape_bounds: Tuple[Vec2f, Vec2f] | None = self.obj.shape.get_bounds()
@@ -39,11 +40,12 @@ class Button:
 
         return (
             Vec2f(start.x + self.position.x, start.y + self.position.y),
-            Vec2f(end.x + self.position.y, end.y + self.position.y),
+            Vec2f(end.x + self.position.x, end.y + self.position.y),
         )
 
     def set_position(self, pos: Vec2f):
         self.position = pos
+        self.bounds = self.get_bounds()
 
     def render_obj_old(self, object: Object, scale, color):
         gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
@@ -53,7 +55,7 @@ class Button:
         gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
 
     def in_bounds(self, pos: Vec2f) -> bool:
-        shape_bounds: Tuple[Vec2f, Vec2f] | None = self.get_bounds()
+        shape_bounds: Tuple[Vec2f, Vec2f] | None = self.bounds
 
         start, end = shape_bounds
 
