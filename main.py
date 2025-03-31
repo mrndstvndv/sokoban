@@ -4,10 +4,10 @@ from assets.text import PixelCrate
 import config
 from game import Game
 import levels
-from scenes import Scene, GameScene, MenuScene
+from scenes import Scene, GameScene, MenuScene, chooserscene
 from scenes.gamepixelscene import GamePixelScene
 from shaders import create_shader_program
-from config import DISPLAY_HEIGHT, DISPLAY_WIDTH, gl, context
+from config import DISPLAY_HEIGHT, DISPLAY_WIDTH, GOTO, gl, context
 import shaders
 
 
@@ -46,12 +46,21 @@ def main():
         for event in events:
             if event.type == pygame.QUIT:
                 running = False
+
+            if event.type == config.LEVEL_CHOSEN:
+                currentScene = gamePixelScene
+
             if event.type == config.BUTTON_CLICKED:
                 if event.button == "play":
-                    if game.load_level() == 0:
-                        pass
+                    if game.load_level() != 0:
+                        currentScene = chooserscene.ChooserScene(game, shader, game.load_level())
                     else:
                         currentScene = gamePixelScene
+
+            if event.type == config.GOTO:
+                if event.scene == "MENU":
+                    currentScene = menuScene
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_2:
                     currentScene = menuScene

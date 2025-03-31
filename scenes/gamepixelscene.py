@@ -1,16 +1,14 @@
 from typing import List
-from assets import text
 from assets.text import *
-from game import P, PB, W, B, C, CB, Game
-import levels
+from game import P, PB, W, B, C, CB
 import pygame
-from objects import Object, Rectangle, Square
+from objects import Object
 from scenes.scene import Scene
 from pygame.event import Event
 from OpenGL.GL import *
-from config import gl
-from utils import Vec2f
+from config import GOTO
 from objects import *
+import utils
 
 
 class GamePixelScene(Scene):
@@ -90,6 +88,8 @@ class GamePixelScene(Scene):
                     self.game.move_player(0, 1)
                 if event.key == pygame.K_r:
                     self.game.reset_level()
+                if event.key == pygame.K_ESCAPE:
+                    utils.post_event(GOTO, scene="MENU")
 
         for index, num in enumerate(str(self.game.level_index + 1)):
             x = index * 1.15

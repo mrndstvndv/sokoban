@@ -52,7 +52,10 @@ class Button:
         gl.glUniform2f(self.offset_location, *self.position)
         gl.glUniform1f(self.scale_location, scale)
         gl.glBindVertexArray(object.vao)
-        gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
+        if object.index == None:
+            gl.glDrawElements(GL_TRIANGLES, object.square_index, gl.GL_UNSIGNED_INT, None)
+        else:
+            gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
 
     def in_bounds(self, pos: Vec2f) -> bool:
         shape_bounds: Tuple[Vec2f, Vec2f] | None = self.bounds

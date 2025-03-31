@@ -177,6 +177,7 @@ class Square(Object):
 class One(Object):
     def __init__(self):
         shape = Shape()
+        self.shape = shape
         points = [
             (0.05, 0.45),
             (0.05, 0.35),
@@ -213,6 +214,7 @@ class One(Object):
 class Two(Object):
     def __init__(self):
         shape = Shape()
+        self.shape = shape
 
         height = 0.5
         width = 0.5
@@ -258,6 +260,7 @@ class Two(Object):
 class Three(Object):
     def __init__(self):
         shape = Shape()
+        self.shape = shape
 
         height = 0.5
         width = 0.5
@@ -303,6 +306,7 @@ class Three(Object):
 class Four(Object):
     def __init__(self):
         shape = Shape()
+        self.shape = shape
 
         height = 0.5
         width = 0.5
@@ -334,6 +338,7 @@ class Four(Object):
 class Five(Object):
     def __init__(self):
         shape = Shape()
+        self.shape = shape
 
         height = 0.5
         width = 0.5
@@ -379,6 +384,7 @@ class Five(Object):
 class Six(Object):
     def __init__(self):
         shape = Shape()
+        self.shape = shape
 
         height = 0.5
         width = 0.5
@@ -431,6 +437,7 @@ class Six(Object):
 class Seven(Object):
     def __init__(self) -> None:
         shape = Shape()
+        self.shape = shape
         points = [
             (-0.45, 0.45),
             (-0.45, 0.35),
@@ -477,6 +484,7 @@ class Seven(Object):
 class Eight(Object):
     def __init__(self) -> None:
         shape = Shape()
+        self.shape = shape
         points = [
             (-0.45, 0.45),
             (-0.45, 0.35),
@@ -563,6 +571,7 @@ class Eight(Object):
 class Nine(Object):
     def __init__(self) -> None:
         shape = Shape()
+        self.shape = shape
         points = [
             (-0.45, 0.45),
             (-0.45, 0.35),
@@ -629,6 +638,7 @@ class Nine(Object):
 class Zero(Object):
     def __init__(self) -> None:
         shape = Shape()
+        self.shape = shape
         points = [
             (-0.45, 0.45),
             (-0.45, 0.35),
