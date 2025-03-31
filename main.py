@@ -1,7 +1,10 @@
 import pygame
 from pygame.locals import *
+from assets.text import PixelCrate
 import config
+from game import Game
 from scenes import Scene, GameScene, MenuScene
+from scenes.gamepixelscene import GamePixelScene
 from shaders import create_shader_program
 from config import DISPLAY_HEIGHT, DISPLAY_WIDTH, gl, context
 import shaders
@@ -15,6 +18,9 @@ def main():
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, context)
     pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT), DOUBLEBUF | OPENGL)
 
+    gl.glEnable(gl.GL_BLEND);
+    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
+
     gl.glViewport(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT)
     gl.glClearColor(0.0, 0.0, 0.0, 0.0)
 
@@ -25,6 +31,7 @@ def main():
         shaders.vertex_shader_src, shaders.fragment_shader_src
     )
 
+    gamePixelScene: GamePixelScene = GamePixelScene(shader)
     gameScene: GameScene = GameScene(shader)
     menuScene: MenuScene = MenuScene(shader)
 
@@ -45,6 +52,8 @@ def main():
                     currentScene = menuScene
                 if event.key == pygame.K_1:
                     currentScene = gameScene
+                if event.key == pygame.K_3:
+                    currentScene = gamePixelScene
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 

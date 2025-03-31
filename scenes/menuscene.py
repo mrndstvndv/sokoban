@@ -1,6 +1,5 @@
 from math import remainder
 from typing import Callable, List, Tuple
-from OpenGL.GL import *
 import pygame
 from pygame.event import Event
 from assets.text import Options, Play
@@ -8,6 +7,7 @@ import config
 from game import PB
 from objects import Object, Rectangle
 from scenes.gamescene import PURPLE
+from OpenGL.GL import GL_TRIANGLES
 from scenes.scene import Scene
 from config import gl
 from utils import Vec2f, normalize

@@ -1,9 +1,9 @@
-from game import W, C, B, P, PB, CB
+from game import W, C, B, P, PB, CB, G
 
 level_1 = [
     [0, 0, W, W, W, 0, 0, 0, 0],
     [0, 0, W, B, W, 0, 0, 0, 0],
-    [0, 0, W, 0, W, W, W, W, 0],
+    [0, 0, W, G, W, W, W, W, 0],
     [W, W, W, C, 0, C, B, W, 0],
     [W, B, 0, C, P, W, W, W, 0],
     [W, W, W, W, C, W, 0, 0, 0],

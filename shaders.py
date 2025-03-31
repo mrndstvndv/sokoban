@@ -21,13 +21,16 @@ fragment_shader_src = """
 #version 330 core
 
 uniform vec4 color;
+uniform float opacity;
 
 in vec4 vertexColor;
 
 out vec4 FragColor;
 
 void main(){
-    FragColor = vertexColor.a > 0.0 ? vertexColor : color;
+    vec4 finalColor = vertexColor;
+    finalColor.a = opacity != 0.0 ? opacity : vertexColor.a;
+    FragColor = finalColor.a > 0.0 ? finalColor : color;
 }
 """
 
@@ -59,4 +62,3 @@ def create_shader_program(vertex_shader_src: str, fragment_shader_src: str):
     gl.glDeleteShader(fragment_shader)
 
     return shader_program
-

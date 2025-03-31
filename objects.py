@@ -57,7 +57,7 @@ def create_object(vertices, indices_arr):
 
 
 class Shape:
-    def __init__(self, scale=1):
+    def __init__(self, scale: float = 1):
         self.vertices = []
         self.indices = []
         self.scale = scale
@@ -160,13 +160,16 @@ class Object:
 
 
 class Square(Object):
-    def __init__(self):
+    def __init__(self, size: float = 1):
         shape = Shape()
+
+        size = size / 2
+
         shape.square(
-            (-0.5, -0.5),  # Bottom-left
-            (0.5, -0.5),  # Bottom-right
-            (0.5, 0.5),  # Top-right
-            (-0.5, 0.5),  # Top
+            (-size, -size),  # Bottom-left
+            (size, -size),  # Bottom-right
+            (size, size),  # Top-right
+            (-size, size),  # Top
         )
         self.vao, self.ebo, self.square_index = shape.build()
 
