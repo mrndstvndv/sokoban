@@ -1,5 +1,6 @@
 from typing import List
-from assets.text import PixelBomb, PixelCrate, PixelGrass, PixelPlayer, PixelWall
+from assets import text
+from assets.text import *
 from game import P, PB, W, B, C, CB, Game
 import levels
 import pygame
@@ -20,6 +21,21 @@ class GamePixelScene(Scene):
         self.opacity_location = gl.glGetUniformLocation(shader, "opacity")
         self.crate = PixelCrate()
         self.wall = PixelWall()
+        self.walltd = WallTopDown()
+        self.wallld = WallLeftDown()
+        self.walllr = WallLeftRight()
+        self.walldr = WallDownRight()
+        self.walld = WallDown()
+        self.wallt = WallTop()
+        self.wallr = WallLeft()
+        self.walll = WallRight()
+        self.walltr = WallTopRight()
+        self.walllt = WallLeftTop()
+        self.walltdr = WallTopDownRight()
+        self.walltlr = WallTopLeftRight()
+        self.walldlr = WallDownLeftRight()
+        self.walltdl = WallTopDownLeft()
+        self.walltl = WallTopLeft()
         self.bomb = PixelBomb()
         self.grass = PixelGrass()
         self.player = PixelPlayer()
@@ -33,7 +49,7 @@ class GamePixelScene(Scene):
         gl.glUniform1f(self.scale_location, scale)
         gl.glUniform1f(self.opacity_location, color[3])
         gl.glBindVertexArray(object.vao)
-        gl.glDrawElements(GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
+        gl.glDrawElements(gl.GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
 
     def render(self, events: List[Event]) -> None:
         num_rows = len(self.game.current_level)
@@ -60,7 +76,83 @@ class GamePixelScene(Scene):
                 y = ((num_rows - 1 - row) - num_rows / 2) * self.width
 
                 if obj == W:
-                    self.render_obj_old(self.wall, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0))
+                    top = self.game.current_level[row - 1][col] if row > 0 else None
+                    down = (
+                        self.game.current_level[row + 1][col]
+                        if row < num_rows - 1
+                        else None
+                    )
+                    left = self.game.current_level[row][col - 1] if col > 0 else None
+                    right = (
+                        self.game.current_level[row][col + 1]
+                        if col < len(r_val) - 1
+                        else None
+                    )
+
+                    if top == W and down == W and right == W:
+                        self.render_obj_old(
+                            self.walltdr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif top == W and left == W and right == W:
+                        self.render_obj_old(
+                            self.walltlr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif top == W and down == W and left == W:
+                        self.render_obj_old(
+                            self.walltdl, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif down == W and left == W and right == W:
+                        self.render_obj_old(
+                            self.walldlr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif top == W and left == W:
+                        self.render_obj_old(
+                            self.walltl, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif top == W and down == W:
+                        self.render_obj_old(
+                            self.walltd, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif left == W and down == W:
+                        self.render_obj_old(
+                            self.wallld, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif left == W and right == W:
+                        self.render_obj_old(
+                            self.walllr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif down == W and right == W:
+                        self.render_obj_old(
+                            self.walldr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif top == W and right == W:
+                        self.render_obj_old(
+                            self.walltr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif left == W and top == W:
+                        self.render_obj_old(
+                            self.walllt, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif down == W:
+                        self.render_obj_old(
+                            self.walld, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif top == W:
+                        self.render_obj_old(
+                            self.wallt, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif left == W:
+                        self.render_obj_old(
+                            self.walll, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    elif right == W:
+                        self.render_obj_old(
+                            self.wallr, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
+                    else:
+                        self.render_obj_old(
+                            self.wall, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0)
+                        )
 
                 if obj == C:
                     self.render_obj_old(self.crate, (x, y), 1.0, (1.0, 1.0, 1.0, 1.0))

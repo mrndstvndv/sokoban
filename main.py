@@ -35,7 +35,7 @@ def main():
     gameScene: GameScene = GameScene(shader)
     menuScene: MenuScene = MenuScene(shader)
 
-    currentScene: Scene = gameScene
+    currentScene: Scene = menuScene
 
     while running:
         events = pygame.event.get()
@@ -46,7 +46,7 @@ def main():
             if event.type == config.BUTTON_CLICKED:
                 pass
                 if event.button == "play":
-                    currentScene = gameScene
+                    currentScene = gamePixelScene
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_2:
                     currentScene = menuScene

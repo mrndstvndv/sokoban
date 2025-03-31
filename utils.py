@@ -19,3 +19,10 @@ def post_event(event_type, **kwargs):
     """Helper method to post a custom event to pygame's event queue"""
     event = pygame.event.Event(event_type, kwargs)
     pygame.event.post(event)
+
+
+def safe_get(lst, index):
+    try:
+        return lst[index]
+    except IndexError:
+        return None
