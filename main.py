@@ -60,6 +60,8 @@ def main():
             if event.type == config.GOTO:
                 if event.scene == "MENU":
                     currentScene = menuScene
+                if event.scene == "QUIT":
+                    running = False
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_2:

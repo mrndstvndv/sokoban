@@ -9,8 +9,8 @@ from objects import Object, Rectangle
 from scenes.gamescene import PURPLE
 from OpenGL.GL import GL_TRIANGLES
 from scenes.scene import Scene
-from config import gl
-from utils import Vec2f, normalize
+from config import GOTO, gl
+from utils import Vec2f, normalize, post_event
 import utils
 
 
@@ -111,7 +111,7 @@ class MenuScene(Scene):
         self.pbtn.set_on_click(
             lambda: utils.post_event(config.BUTTON_CLICKED, button="play")
         )
-        self.obtn.set_on_click(lambda: print("play button clicked!"))
+        self.obtn.set_on_click(lambda: post_event(GOTO, scene="QUIT"))
         self.title = Button(Vec2f(-1.8*1.5, 6.0), 1.0, 1.0, Title(), shader)
 
     def render(self, events) -> None:
