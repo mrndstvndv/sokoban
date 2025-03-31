@@ -153,6 +153,7 @@ class GameScene(Scene):
 
         if self.game.check_win():
             print("You win")
+            self.game.save_level()
             if not self.game.next_level():
                 print("Game completed!")
 

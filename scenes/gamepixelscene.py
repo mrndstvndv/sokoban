@@ -10,15 +10,28 @@ from pygame.event import Event
 from OpenGL.GL import *
 from config import gl
 from utils import Vec2f
+from objects import *
 
 
 class GamePixelScene(Scene):
-    def __init__(self, shader) -> None:
+    def __init__(self, game, shader) -> None:
         super().__init__(shader)
         self.color_location = gl.glGetUniformLocation(shader, "color")
         self.offset_location = gl.glGetUniformLocation(shader, "offset")
         self.scale_location = gl.glGetUniformLocation(shader, "scale")
         self.opacity_location = gl.glGetUniformLocation(shader, "opacity")
+        self.nums = [
+            Zero(),
+            One(),
+            Two(),
+            Three(),
+            Four(),
+            Five(),
+            Six(),
+            Seven(),
+            Eight(),
+            Nine(),
+        ]
         self.crate = PixelCrate()
         self.wall = PixelWall()
         self.walltd = WallTopDown()
@@ -39,7 +52,7 @@ class GamePixelScene(Scene):
         self.bomb = PixelBomb()
         self.grass = PixelGrass()
         self.player = PixelPlayer()
-        self.game = Game(levels.levels)
+        self.game = game
         start, end = self.crate.shape.get_bounds()
         self.width = end.x - start.x
 
@@ -50,6 +63,15 @@ class GamePixelScene(Scene):
         gl.glUniform1f(self.opacity_location, color[3])
         gl.glBindVertexArray(object.vao)
         gl.glDrawElements(gl.GL_TRIANGLES, object.index, gl.GL_UNSIGNED_INT, None)
+
+    def render_obj(self, object, x, y, color):
+        gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
+        gl.glUniform2f(self.offset_location, x, y)
+        gl.glUniform1f(self.scale_location, 1.0)
+        gl.glBindVertexArray(object.vao)
+        gl.glDrawElements(
+            gl.GL_TRIANGLES, object.square_index, gl.GL_UNSIGNED_INT, None
+        )
 
     def render(self, events: List[Event]) -> None:
         num_rows = len(self.game.current_level)
@@ -69,10 +91,15 @@ class GamePixelScene(Scene):
                 if event.key == pygame.K_r:
                     self.game.reset_level()
 
+        for index, num in enumerate(str(self.game.level_index + 1)):
+            x = index * 1.15
+            y = 9
+            self.render_obj(self.nums[int(num)], x, y, (1.0, 1.0, 1.0, 1.0))
+
         for row, r_val in enumerate(self.game.current_level):
             for col, obj in enumerate(r_val):
                 # Center the level and reverse columns to fix orientation
-                x = (col - 2.0) * self.width
+                x = (col - 1.5) * self.width
                 y = ((num_rows - 1 - row) - num_rows / 2) * self.width
 
                 if obj == W:
@@ -175,3 +202,6 @@ class GamePixelScene(Scene):
             print("You win")
             if not self.game.next_level():
                 print("Game completed!")
+
+            if self.game.level_index > self.game.load_level():
+                self.game.save_level()

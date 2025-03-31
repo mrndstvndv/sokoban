@@ -3,6 +3,7 @@ from pygame.locals import *
 from assets.text import PixelCrate
 import config
 from game import Game
+import levels
 from scenes import Scene, GameScene, MenuScene
 from scenes.gamepixelscene import GamePixelScene
 from shaders import create_shader_program
@@ -31,7 +32,9 @@ def main():
         shaders.vertex_shader_src, shaders.fragment_shader_src
     )
 
-    gamePixelScene: GamePixelScene = GamePixelScene(shader)
+    game = Game(levels.levels)
+
+    gamePixelScene: GamePixelScene = GamePixelScene(game, shader)
     gameScene: GameScene = GameScene(shader)
     menuScene: MenuScene = MenuScene(shader)
 
@@ -44,9 +47,11 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == config.BUTTON_CLICKED:
-                pass
                 if event.button == "play":
-                    currentScene = gamePixelScene
+                    if game.load_level() == 0:
+                        pass
+                    else:
+                        currentScene = gamePixelScene
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_2:
                     currentScene = menuScene

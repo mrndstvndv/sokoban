@@ -2,7 +2,7 @@ from math import remainder
 from typing import Callable, List, Tuple
 import pygame
 from pygame.event import Event
-from assets.text import Options, Play
+from assets.text import Options, Play, Title
 import config
 from game import PB
 from objects import Object, Rectangle
@@ -100,30 +100,27 @@ class MenuScene(Scene):
         self.color_location = gl.glGetUniformLocation(shader, "color")
         self.offset_location = gl.glGetUniformLocation(shader, "offset")
         self.scale_location = gl.glGetUniformLocation(shader, "scale")
-        self.rectangle = Rectangle(Vec2f(-4.0, 1.0), Vec2f(4.0, -1.0))
-        self.pbtn = Button(Vec2f(0.0, 1.25), 1.0, 1.1, Play(), shader)
-        self.obtn = Button(Vec2f(0.0, -1.25), 1.0, 1.1, Options(), shader)
+
+        offset = -1.5
+
+        self.pbtn = Button(Vec2f(0.0, 1.25+offset), 1.0, 1.1, Play(), shader)
+        self.obtn = Button(Vec2f(0.0, -1.25+offset), 1.0, 1.1, Options(), shader)
         self.pbtn.set_on_click(
             lambda: utils.post_event(config.BUTTON_CLICKED, button="play")
         )
         self.obtn.set_on_click(lambda: print("play button clicked!"))
-
-    def render_obj(self, object: Object, scale, color):
-        gl.glUniform4f(self.color_location, color[0], color[1], color[2], color[3])
-        gl.glUniform2f(self.offset_location, 0.0, 0.0)
-        gl.glUniform1f(self.scale_location, scale)
-        gl.glBindVertexArray(object.vao)
-        gl.glDrawElements(GL_TRIANGLE_FAN, object.index, gl.GL_UNSIGNED_INT, None)
+        self.title = Button(Vec2f(-1.8*1.5, 6.0), 1.0, 1.0, Title(), shader)
 
     def render(self, events) -> None:
         super().render(events)
         gl.glClearColor(1.0, 1.0, 0.0, 1.0)
 
         self.pbtn.render(events)
+        self.title.render(events)
         self.obtn.render(events)
+
 
         # self.render_obj_old(self.a, self.current_scale * 20, (1.0, 1.0, 1.0, 1.0))
 
     def de_init(self) -> None:
         super().de_init()
-        self.rectangle.de_init()
