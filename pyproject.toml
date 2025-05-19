@@ -5,15 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "init>=0.1.0",
     "numpy>=2.0.2",
     "pygame>=2.6.1",
     "pyopengl>=3.1.9",
-]
-
-[dependency-groups]
-dev = [
-    "buildozer>=1.5.0",
-    "cython==0.29.33",
-    "pip>=25.0.1",
 ]
